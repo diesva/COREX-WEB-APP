@@ -1,16 +1,17 @@
 import styled from "styled-components";
-import Lottie from "react-lottie";
+import { Player } from "@lottiefiles/react-lottie-player";
+
 export function Lottieanimacion({ alto, ancho, animacion }) {
-    const defaultOptions = {
-        loop: true,
-        autoplay: true,
-        animationData: animacion,
-      };
   return (
     <Container>
-     <Lottie options={defaultOptions}
-      height={`${alto}px`} width={`${ancho}px`} isClickToPauseDisabled/>
+      <Player
+        autoplay
+        loop
+        src={animacion}
+        style={{ height: `${alto}px`, width: `${ancho}px` }}
+      />
     </Container>
   );
 }
+
 const Container = styled.div``;

@@ -16,10 +16,10 @@ export function BannerHome() {
         <div className="content-wrapper-context">
           <span className="titulo">
             {<v.iconoempresa />}
-            Bienvenido a StockPRO
+            Bienvenido a Corex
           </span>
           <div className="content-text">
-            StockPRO te ayuda a tener un control de tus inventarios desde
+            Corex te ayuda a tener un control de tus inventarios desde
             cualquier dispositivo.
           </div>
 

@@ -12,11 +12,11 @@ export function FooterLogin() {
         </span>
       </section>
       <section className="derechos">
-        <span>StockPRO S.A - RUC: 20100047218</span>
+        <span>COREX - Sistema de Gestión de Inventariado</span>
         <div className="separador"></div>
         <span>Todos los derechos reservados</span>
         <div className="separador"></div>
-        <span>© 2023 codigo369.com</span>
+        <span>© 2025 devsoftagencia.com</span>
       </section>
     </Container>
   );

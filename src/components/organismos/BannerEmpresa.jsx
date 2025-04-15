@@ -20,7 +20,7 @@ export function BannerEmpresa() {
 
           </span>
           <div className="content-text">
-            StockPRO te mantiene siempre informado.
+            COREX te mantiene siempre informado.
           </div>
         
 

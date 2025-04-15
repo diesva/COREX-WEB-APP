@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@lottiefiles/react-lottie-player": "^3.6.0",
     "@mui/material": "^5.14.10",
     "@react-pdf/renderer": "^3.4.4",
     "@supabase/supabase-js": "^2.33.1",
@@ -31,7 +32,6 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.46.1",
     "react-icons": "^4.11.0",
-    "react-lottie": "^1.2.3",
     "react-router-dom": "^6.15.0",
     "react-spinners": "^0.13.8",
     "styled-components": "^6.0.7",
