@@ -6,9 +6,8 @@ export function FooterLogin() {
       <section className="lock">
         <GiPadlock />
         <span>
-          Esta es una página segura de codigo369. Si tienes dudas sobre la
-          autenticidad de la web, comunícate con
-          <br /> nosotros al 311-9898 o a través de nuestros medios digitales.
+          Esta es una página segura de la Subregión Ilo.
+          <br /> Si detecta inconvenientes con el sistema, por favor comunicar al Desarrollador.
         </span>
       </section>
       <section className="derechos">
