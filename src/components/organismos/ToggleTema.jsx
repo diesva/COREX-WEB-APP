@@ -34,8 +34,8 @@ export function ToggleTema() {
             r="44.5"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="385"
@@ -43,8 +43,8 @@ export function ToggleTema() {
             r="21.5"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="166"
@@ -52,8 +52,8 @@ export function ToggleTema() {
             r="27.84"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="261.25"
@@ -61,8 +61,8 @@ export function ToggleTema() {
             r="14.75"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="151.5"
@@ -70,8 +70,8 @@ export function ToggleTema() {
             r="28"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="297.5"
@@ -79,8 +79,8 @@ export function ToggleTema() {
             r="27.5"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="395"
@@ -88,8 +88,8 @@ export function ToggleTema() {
             r="18.5"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <circle
             cx="317"
@@ -97,14 +97,14 @@ export function ToggleTema() {
             r="8"
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
           ></circle>
           <path
             fill="#666865"
             stroke="#5E5E5D"
-            stroke-miterlimit="10"
-            stroke-width="4"
+            strokeMiterlimit="10"
+            strokeWidth="4"
             d="M299.55,450.38   c-12.27,2.34-24.87,3.55-37.66,3.55c-27.92,0-54.94-5.739-80.32-17.04c-7.74-3.46-15.3-7.43-22.47-11.81   c-6.96-4.24-13.77-9-20.24-14.14c-5.28-4.19-10.3-8.62-15.07-13.25c-1.3-1.261-2.57-2.54-3.82-3.83   c-0.06-0.051-0.12-0.11-0.18-0.17c-32.64-31.721-53.18-73.381-58.42-119.21c-4.54-39.75,2.83-79.04,20.95-113.75   c4.99-9.561,10.81-18.78,17.41-27.561c1.09-1.449,2.2-2.89,3.34-4.319c0.55-0.69,1.1-1.37,1.65-2.051   c-0.16,3.011-0.29,6.2-0.39,9.58c-2.39,79.15,12.97,253.43,185.661,310.98C293.12,448.41,296.31,449.42,299.55,450.38z"
             opacity=".2"
           ></path>
@@ -121,7 +121,7 @@ export function ToggleTema() {
         </defs>
         <g
           fill="#ffac33"
-          clip-path="url(#a)"
+          clipPath="url(#a)"
           transform="matrix(1.25 0 0 -1.25 0 47.5)"
         >
           <path

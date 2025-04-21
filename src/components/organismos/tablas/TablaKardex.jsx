@@ -110,7 +110,7 @@ export function TablaKardex({
     },
     {
       accessorKey: "detalle",
-      header: "Delle",
+      header: "Motivo",
       enableSorting: false,
       cell: (info) => (
         <td data-title="Usuario" className="ContentCell">
