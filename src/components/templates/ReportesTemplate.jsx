@@ -14,7 +14,7 @@ export function ReportesTemplate() {
               Por producto
             </SidebarItem>
             <SidebarItem to="stock-actual-todos">Todos</SidebarItem>
-            <SidebarItem to="stock-bajo-minimo">Bajo del mínimo</SidebarItem>
+            
           </SidebarSection>
           <SidebarSection>
           <SidebarTitle>Entradas y salidas</SidebarTitle>
