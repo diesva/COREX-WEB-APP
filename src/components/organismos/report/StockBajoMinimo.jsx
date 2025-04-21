@@ -39,7 +39,7 @@ function StockBajoMinimo() {
       borderLeft: 1,
       textAlign: "left",
       justifyContent: "flex-start",
-      /*alignItems: "center",*/
+      alignItems: "center",
     },
     cell: {
       flex: 1,

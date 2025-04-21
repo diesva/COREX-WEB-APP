@@ -20,7 +20,7 @@ export function BannerEmpresa() {
 
           </span>
           <div className="content-text">
-            COREX te mantiene siempre informado.
+            Corex - Información del Almacen.
           </div>
         
 
@@ -57,7 +57,7 @@ export function BannerEmpresa() {
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(246 158.5) rotate(90) scale(212.625 212.625)"
             >
-              <stop offset="0.343728" stop-color="white" />
+              <stop offset="0.343728" stopColor="white" />
               <stop offset="1" stopOpacity="0" />
             </radialGradient>
           </defs>

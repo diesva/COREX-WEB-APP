@@ -25,7 +25,7 @@ export function EmpresaTemplate() {
       <section className="area1">
         <ContentFiltro>
           <Title>
-            Tu empresa
+            Almacen
           </Title>
          
         </ContentFiltro>

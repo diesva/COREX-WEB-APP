@@ -83,7 +83,7 @@ export const DataModulosConfiguracion =[
   },
 
   {
-    title:"Tu empresa",
+    title:"Almacen",
     subtitle:"configura tus opciones básicas",
     icono:"https://i.ibb.co/x7mHPgm/administracion-de-empresas.png",
     link:"/configurar/empresa",
