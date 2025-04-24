@@ -69,7 +69,7 @@ export function RegistrarAdmin({ state, setState }) {
                   pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
                 })}
               />
-               <label className="form__label">email</label>
+               <label className="form__label">E-mail</label>
               {errors.correo?.type === "pattern" && (
                 <p>El formato del email es incorrecto</p>
               )}
@@ -79,18 +79,22 @@ export function RegistrarAdmin({ state, setState }) {
           <article>
             <InputText icono={<RiLockPasswordLine />}>
               <input  className="form__field"
+              //Cambiar la opción de la contraseña que sea visible tipo "text" , de lo contrario "password"
                 type="text"
+                
                 placeholder="pass"
                 {...register("pass", {
                   required: true,
                 })}
               />
- <label className="form__label">pass</label>
+ <label className="form__label">Contraseña</label>
               {errors.pass?.type === "required" && <p>Campo requerido</p>}
+              
             </InputText>
           </article>
           <div className="btnguardarContent">
             <Btnsave
+            
               icono={<v.iconoguardar />}
               titulo="Guardar"
               bgcolor="#ff7556"  

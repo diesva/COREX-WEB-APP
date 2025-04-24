@@ -13,19 +13,27 @@ export async function InsertarKardex(p) {
 }
 
 export async function MostrarKardex(p) {
-  const { data } = await supabase
+  const { data,error } = await supabase
     .rpc("mostrarkardexempresa", {
       _id_empresa: p.id_empresa,
     })
     .order("id", { ascending: false });
-  return data;
+if (error) {
+  console.error("Error en MostrarKardex", error.message);
+  return[];
+}
+return data ?? [];
 }
 export async function BuscarKardex(p) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .rpc("buscarkardexempresa", {
       _id_empresa: p.id_empresa,
       buscador: p.buscador,
     })
     .order("id", { ascending: false });
-  return data;
+    if (error) {
+      console.error("Error en BuscarKardex", error.message);
+      return[];
+    }
+    return data ?? [];
 }

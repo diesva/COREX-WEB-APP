@@ -16,6 +16,8 @@ import {
 } from "../../../index";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Image } from "@react-pdf/renderer";
+
 
 function StockActualPorProducto() {
   const [stateListaproductos, setstateListaProductos] = useState(false);
@@ -115,6 +117,10 @@ function StockActualPorProducto() {
           <Page size="A4" orientation="portrait">
             <View style={styles.page}>
               <View style={styles.section}>
+              <Image
+                  src='../src/assets/COREX.png'
+                  style={{ width: 100, height: 100, marginBottom: 10 }}
+                />
                 <Text
                   style={{
                     fontSize: 18,

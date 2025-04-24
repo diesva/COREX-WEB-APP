@@ -23,8 +23,8 @@ function KardexEntradaSalida() {
     useProductosStore();
   const { dataempresa } = useEmpresaStore();
   const { data, isLoading, error } = useQuery({
-    queryKey: ["reporte kardex entrada salida", { _id_empresa: dataempresa?.id,_id_producto:productoItemSelect?.id }],
-    queryFn: () => reportKardexEntradaSalida({ _id_empresa: dataempresa?.id,_id_producto:productoItemSelect.id }),
+    queryKey: ["reporte kardex entrada salida", { _id_empresa: dataempresa?.id,_id_producto:productoItemSelect?.id}],
+    queryFn: () => reportKardexEntradaSalida({ _id_empresa: dataempresa?.id,_id_producto:productoItemSelect.id}),
     enabled: !!dataempresa,
   });
   const {

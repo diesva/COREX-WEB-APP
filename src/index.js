@@ -119,3 +119,4 @@ export * from './supabase/globalSupabase';
 export * from './supabase/supabase.config';
 export * from './utils/Conversiones';
 export * from './utils/dataEstatica';
+export * from './store/reportesPersonalizados';

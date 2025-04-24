@@ -8,8 +8,15 @@ import {
   useAuthStore,
   useUsuariosStore,
 } from "../../index";
+import { useNavigate } from "react-router-dom";
+
+
 
 export function DataUser({ stateConfig }) {
+  const navigate = useNavigate();
+
+
+
   const { mostrarUsuarios, datausuarios, idusuario, setiduser } =
     useUsuariosStore();
 
@@ -17,12 +24,13 @@ export function DataUser({ stateConfig }) {
   const { signout } = useAuthStore();
   const funcionXtipo = async (p) => {
     if (p.tipo === "cerrarsesion") {
-      // queryClient.removeQueries();
-      // queryClient.resetQueries();
-      // queryClient.refetchQueries()
-      // setiduser();
       await signout();
     }
+    else if (p.tipo === "configuracion") {
+      navigate("/configurar");
+
+    }
+  
   };
   return (
     <Container onClick={stateConfig.setState}>

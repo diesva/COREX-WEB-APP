@@ -228,7 +228,7 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
                     required: true,
                   })}
                 />
-                <label className="form__label">Codigo de barras</label>
+                <label className="form__label">Codigo de almacen</label>
 
                 {errors.codigobarras?.type === "required" && (
                   <p>Campo requerido</p>
@@ -246,7 +246,7 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
                     required: true,
                   })}
                 />
-                <label className="form__label">Codigo interno</label>
+                <label className="form__label">Codigo de Almacen</label>
 
                 {errors.codigointerno?.type === "required" && (
                   <p>Campo requerido</p>
