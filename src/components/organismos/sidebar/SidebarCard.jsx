@@ -3,6 +3,7 @@ import { v, Btnsave, useAuthStore } from "../../../index";
 export function SidebarCard() {
   const { signout } = useAuthStore();
   return (
+    //Abajo del container: <span className="icon">{<v.iconoayuda />}</span>
     <Container>
       <span className="icon">{<v.iconoayuda />}</span>
       <div className="cardContent">
@@ -10,7 +11,7 @@ export function SidebarCard() {
         <div className="circle2"></div>
         <h3>Cerrar sesión</h3>
         <div className="contentBtn">
-          <Btnsave titulo="Cerrar ..." bgcolor="#f8f2fd" funcion={signout} />
+          <Btnsave titulo="Cerrar" bgcolor="#f8f2fd" funcion={signout} />
         </div>
       </div>
     </Container>
@@ -68,6 +69,8 @@ const Container = styled.div`
     .contentBtn {
       position:relative;
       margin-left:-8px;
+      display: flex;
+      justify-content: center;
     }
   }
 `;

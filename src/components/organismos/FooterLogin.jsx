@@ -15,7 +15,8 @@ export function FooterLogin() {
         <div className="separador"></div>
         <span>Todos los derechos reservados</span>
         <div className="separador"></div>
-        <span>© 2025 devsoftagencia.com</span>
+        <span>© 2025 <a href="https://devsoftagencia.com" target="_blank" rel="noopener noreferrer">
+          DevSoft Agencia Creativa </a></span>
       </section>
     </Container>
   );

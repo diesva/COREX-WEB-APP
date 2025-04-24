@@ -125,36 +125,65 @@ function KardexEntradaSalida() {
 
       <PDFViewer className="pdfviewer">
         <Document title="Reporte de stock todos">
-          <Page size="A4" orientation="landscape">
-            <View style={styles.page}>
-              <View style={styles.section}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "ultrabold",
-                    marginBottom: 10,
-                  }}
-                >
-                   Kardex - entrada y salida por producto
-                </Text>
-                <Text>Fecha y hora del reporte: {formattedDate}</Text>
-                <View style={styles.table}>
-                  {renderTableRow(
-                    {
-                      nombres: "Usuario",
-                      descripcion: "Producto",
-                      tipo:"Tipo",
-                      cantidad:"Cantidad",
-                      fecha:"Fecha",
-                      stock: "Stock",
-                    },
-                    true
-                  )}
-                  {data?.map((movement) => renderTableRow(movement))}
-                </View>
-              </View>
-            </View>
-          </Page>
+        <Page size="A4" orientation="landscape" style={{ padding: 20 }}>
+  <View style={{ flexDirection: "column", width: "100%" }}>
+    
+    {/* Encabezado Principal */}
+    <Text style={{ fontSize: 16, fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>
+      DOCUMENTO KARDEX - ENTRADA Y SALIDA DE BIENES
+    </Text>
+    
+    {/* Datos Generales */}
+    <View style={{ flexDirection: "row", justifyContent: "space-between", fontSize: 9, marginBottom: 10 }}>
+      <View style={{ width: "48%" }}>
+        <View style={{fontSize: 14,fontWeight: "bold"}}>
+          <Text>Región Moquegua</Text>
+        </View>
+        <Text>U. Orgánica: Sub Gerencia de Infraestructura Pública</Text>
+        <Text>Sec. Func.: Mejoramiento del Servicio de Educación Inicial</Text>
+        <Text>Tarea Func.: 0034-021 Costo Directo</Text>
+        
+      </View>
+      <View style={{ width: "48%" }}>
+        <Text>Fecha: {formattedDate}</Text>
+        <Text>Solicitante: {data?.[0]?.nombres || "Usuario X"}</Text>
+        
+      </View>
+    </View>
+
+    {/* Tabla de Productos */}
+    <View style={styles.table}>
+      {renderTableRow(
+        {
+          nombres: "Usuario",
+          descripcion: "Producto",
+          tipo: "Tipo",
+          cantidad: "Cantidad",
+          fecha: "Fecha",
+          stock: "Stock",
+        },
+        true
+      )}
+      {data?.map((movement, index) => (
+        <View style={styles.row} key={index}>
+          <Text style={styles.cell}>{movement.nombres}</Text>
+          <Text style={styles.cell}>{movement.descripcion}</Text>
+          <Text style={styles.cell}>{movement.tipo}</Text>
+          <Text style={styles.cell}>{movement.cantidad}</Text>
+          <Text style={styles.cell}>{movement.fecha}</Text>
+          <Text style={styles.cell}>{movement.stock}</Text>
+        </View>
+      ))}
+    </View>
+
+    {/* Total */}
+    <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+      <Text style={{ fontSize: 10, fontWeight: "bold" }}>
+        Total movimientos: {data?.length || 0}
+      </Text>
+    </View>
+  </View>
+</Page>
         </Document>
       </PDFViewer>
     </Container>
