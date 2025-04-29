@@ -102,43 +102,34 @@ function StockActualPorProducto() {
         funcion={() => setstateListaProductos(!stateListaproductos)}
         setBuscador={setBuscador}
       />
-      {stateListaproductos && (
-        <ListaGenerica funcion={(p)=>{
-          selectProductos(p)
-          setBuscador("")
-        }}
-          setState={() => setstateListaProductos(!stateListaproductos)}
-          data={dataproductosbuscador}
-        />
-      )}
-
+      <BuscadorContainer>
+        {stateListaproductos && (
+          <ListaGenerica 
+            funcion={(p) => {
+              selectProductos(p)
+              setBuscador("")
+            }}
+            setState={() => setstateListaProductos(!stateListaproductos)}
+            data={dataproductosbuscador?.slice(0, 4)} // <-- SOLO 4 RESULTADOS
+          />
+        )}
+      </BuscadorContainer>
+  
       <PDFViewer className="pdfviewer">
         <Document title="Reporte de stock todos">
           <Page size="A4" orientation="portrait">
             <View style={styles.page}>
               <View style={styles.section}>
-              <Image
-                  src='../src/assets/COREX.png'
+                <Image
+                  src="../src/assets/COREX.png"
                   style={{ width: 100, height: 100, marginBottom: 10 }}
                 />
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "ultrabold",
-                    marginBottom: 10,
-                  }}
-                >
+                <Text style={{ fontSize: 18, fontWeight: "ultrabold", marginBottom: 10 }}>
                   Stock actual por producto
                 </Text>
                 <Text>Fecha y hora del reporte: {formattedDate}</Text>
                 <View style={styles.table}>
-                  {renderTableRow(
-                    {
-                      descripcion: "Producto",
-                      stock: "Stock",
-                    },
-                    true
-                  )}
+                  {renderTableRow({ descripcion: "Producto", stock: "Stock" }, true)}
                   {data?.map((movement) => renderTableRow(movement))}
                 </View>
               </View>
@@ -158,6 +149,22 @@ gap:15px;
   .pdfviewer {
     width: 100%;
     height: 100%;
+  }
+`;
+const BuscadorContainer = styled.div`
+  position: relative;
+  width: 100%;
+
+  > div {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: ${(props) => props.theme.bg};
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
   }
 `;
 export default StockActualPorProducto;

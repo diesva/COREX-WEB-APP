@@ -30,7 +30,7 @@ export const usePermisosStore = create((set, get) => ({
 
     DataModulosConfiguracion.splice(0, DataModulosConfiguracion.length);
     DataModulosConfiguracion.push(...allDocs)
-    console.log("agergando",allDocs)
+    console.log("agregando",allDocs)
 
 
 

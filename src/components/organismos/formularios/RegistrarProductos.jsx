@@ -131,7 +131,7 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
               <Selector
                 state={stateMarca}
                 color="#fc6027"
-                texto1="🍿"
+                texto1=""
                 texto2={marcaItemSelect?.descripcion}
                 funcion={() => setStateMarca(!stateMarca)}
               />
@@ -195,7 +195,7 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
               <Selector
                 state={stateCategoria}
                 color="#fc6027"
-                texto1="🍿"
+                texto1=""
                 texto2={categoriaItemSelect?.descripcion}
                 funcion={() => setStateCategoria(!stateCategoria)}
               />
