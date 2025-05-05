@@ -19,6 +19,7 @@ import Emojipicker from "emoji-picker-react";
 import { useEmpresaStore } from "../../../store/EmpresaStore";
 import { useKardexStore } from "../../../store/KardexStore";
 
+
 export function RegistrarSalidaEntrada({ onClose, dataSelect, accion, tipo }) {
   const { idusuario } = useUsuariosStore();
   const [stateListaProd, SetstateListaProd] = useState(false);
@@ -34,31 +35,46 @@ export function RegistrarSalidaEntrada({ onClose, dataSelect, accion, tipo }) {
     handleSubmit,
     watch,
   } = useForm();
-  async function insertar(data) {
-    if (accion === "Editar") {
-      // const p = {
-      //   id: dataSelect.id,
-      //   descripcion: data.nombre,
-      // };
-      // await editarMarca(p);
-      // onClose();
-    } else {
-      const p = {
-        fecha: new Date(),
-        tipo: tipo,
-        id_usuario: idusuario,
-        id_producto: productoItemSelect.id,
-        cantidad:parseFloat( data.cantidad),
-        detalle: data.detalle,
-        id_empresa:dataempresa.id
-      };
-      await insertarKardex(p);
-      onClose();
-    }
+
+// NUEVO
+const [isSubmitting, setIsSubmitting] = useState(false); // Desactiva botón
+const [estadoProceso, setEstadoproceso] = useState(false); // loader + bloqueo
+
+
+
+
+async function insertar(data) {
+  try {
+    setEstadoproceso(true); // 👈 Bloquea botón y muestra loader INMEDIATAMENTE
+
+    const p = {
+      fecha: new Date(),
+      tipo: tipo,
+      id_usuario: idusuario,
+      id_producto: productoItemSelect.id,
+      cantidad: parseFloat(data.cantidad),
+      detalle: data.detalle,
+      id_empresa: dataempresa.id,
+    };
+
+    await insertarKardex(p);
+
+    // Espera un poco para UX y recarga
+    setTimeout(() => {
+      window.location.reload(); // 👈 Refresca
+    }, 300);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error al guardar. Intenta nuevamente.");
+    setEstadoproceso(false);
   }
+}
+
  
   return (
     <Container>
+      {estadoProceso && <Spinner />} {/* 👈 Muestra loader */}
       <div className="sub-contenedor">
         <div className="headers">
           <section>
@@ -101,15 +117,16 @@ export function RegistrarSalidaEntrada({ onClose, dataSelect, accion, tipo }) {
           <section>
             <article>
               <InputText icono={<v.iconomarca />}>
-                <input
-                  className="form__field"
-                  defaultValue={dataSelect.descripcion}
-                  type="text"
-                  placeholder=""
-                  {...register("cantidad", {
-                    required: true,
-                  })}
-                />
+              <input
+  disabled={isSubmitting}
+  className="form__field"
+  defaultValue={dataSelect.descripcion}
+  type="text"
+  placeholder=""
+  {...register("cantidad", {
+    required: true,
+  })}
+/>
                 <label className="form__label">Cantidad</label>
                 {errors.cantidad?.type === "required" && <p>Campo requerido</p>}
               </InputText>
@@ -131,12 +148,24 @@ export function RegistrarSalidaEntrada({ onClose, dataSelect, accion, tipo }) {
             </article>
 
             <div className="btnguardarContent">
-              <Btnsave
-                icono={<v.iconoguardar />}
-                titulo="Guardar"
-                bgcolor="#ef552b"
-              />
-            </div>
+  <button
+    type="submit"
+    disabled={estadoProceso}
+    style={{
+      all: "unset",
+      cursor: estadoProceso ? "not-allowed" : "pointer",
+      opacity: estadoProceso ? 0.6 : 1,
+    }}
+  >
+    <Btnsave
+      icono={<v.iconoguardar />}
+      titulo={estadoProceso ? "Guardando..." : "Guardar"}
+      bgcolor="#ef552b"
+    />
+  </button>
+</div>
+
+
           </section>
         </form>
       </div>

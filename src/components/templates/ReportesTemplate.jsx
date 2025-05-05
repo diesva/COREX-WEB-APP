@@ -19,7 +19,12 @@ export function ReportesTemplate() {
           <SidebarSection>
           <SidebarTitle>Entradas y salidas</SidebarTitle>
           <SidebarItem to="kardex-entradas-salidas">Por producto</SidebarItem>
+          <SidebarItem to="kardex-salidas">Salida por producto</SidebarItem>
+          <SidebarItem to="kardex-entradas">Entrada por producto</SidebarItem>
           </SidebarSection>
+
+
+
           <SidebarSection>
           <SidebarTitle to="ss">Valorizado</SidebarTitle>
           <SidebarItem to="inventario-valorado">Todos</SidebarItem>

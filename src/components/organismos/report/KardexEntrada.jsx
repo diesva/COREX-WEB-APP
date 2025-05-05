@@ -17,10 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Image } from "@react-pdf/renderer";
 
-function KardexEntradaSalida() {
+function KardexEntrada() {
   const [stateListaproductos, setstateListaProductos] = useState(false);
   const {
-    reportKardexEntradaSalida,
+    reportKardexEntrada,
     buscarProductos,
     buscador,
     setBuscador,
@@ -30,14 +30,12 @@ function KardexEntradaSalida() {
   const { dataempresa } = useEmpresaStore();
 
   const { data, isLoading, error } = useQuery({
-    
     queryKey: [
-      "reporte kardex entrada salida",
+      "reporte kardex entrada",
       { _id_empresa: dataempresa?.id, _id_producto: productoItemSelect?.id },
-      
     ],
     queryFn: () =>
-      reportKardexEntradaSalida({
+      reportKardexEntrada({
         _id_empresa: dataempresa?.id,
         _id_producto: productoItemSelect?.id,
       }),
@@ -52,8 +50,6 @@ function KardexEntradaSalida() {
     queryKey: [
       "buscar productos",
       { id_empresa: dataempresa?.id, descripcion: buscador },
-      console.log("Kardex data", data)
-
     ],
     queryFn: () =>
       buscarProductos({
@@ -112,17 +108,16 @@ function KardexEntradaSalida() {
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
   const renderTableRow = (rowData, isHeader = false) => (
-    <View style={styles.row} key={rowData.id || Math.random()}>
+        <View style={styles.row} key={rowData.id || Math.random()}>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
         {rowData.nombres}
       </Text>
-      <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.codigobarras}
-      </Text>
-      <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.codigointerno}
-      </Text>
-      <Text style={[styles.descripcionCell, isHeader && styles.headerCell]}>
+      <Text
+        style={[
+          styles.descripcionCell,
+          isHeader && styles.headerCell,
+        ]}
+      >
         {rowData.descripcion}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
@@ -138,8 +133,8 @@ function KardexEntradaSalida() {
         {rowData.stock}
       </Text>
     </View>
+
   );
-  
 
   return (
     <Container>
@@ -207,7 +202,7 @@ function KardexEntradaSalida() {
                   marginBottom: 10,
                 }}
               >
-                PEDIDO COMPROBANTE DE SALIDA
+                PEDIDO COMPROBANTE DE ENTRADA
               </Text>
                 <View style={{fontSize: 8, flexDirection: "column", width: "100%", textAlign: "center"}}>
               <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
@@ -228,8 +223,6 @@ function KardexEntradaSalida() {
                 {renderTableRow(
                   {
                     nombres: "Usuario",
-                    codigobarras: "Codigo Barras ",
-                    codigointerno: "Codigo Interno",
                     descripcion: "Producto",
                     tipo: "Tipo",
                     cantidad: "Cantidad",
@@ -238,9 +231,13 @@ function KardexEntradaSalida() {
                   },
                   true
                 )}
-                {data?.slice(0, 99).map((movement, index) =>
-                  renderTableRow(movement)
-                )}
+                {data
+  ?.filter((item) => item.tipo === "entrada")
+  .slice(0, 99)
+  .map((movement, index) => renderTableRow(movement))}
+
+
+                
               </View>
 
               <View
@@ -251,8 +248,7 @@ function KardexEntradaSalida() {
                 }}
               >
                 <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                  Total movimientos mostrados: {Math.min(data?.length || 0, 99999)}
-                  
+                  Total movimientos mostrados: {Math.min(data?.length || 0, 3)}
                 </Text>
               </View>
             </View>
@@ -275,4 +271,4 @@ const Container = styled.div`
   }
 `;
 
-export default KardexEntradaSalida;
+export default KardexEntrada;

@@ -93,6 +93,20 @@ export async function ReportKardexEntradaSalida(p) {
   }
   return data;
 }
+export async function ReportKardexSalida(p) {
+  const { data, error } = await supabase.rpc("mostrarkardexempresa",p)
+  if (error) {
+    return;
+  }
+  return data;
+}
+export async function ReportKardexEntrada(p) {
+  const { data, error } = await supabase.rpc("mostrarkardexempresa",p)
+  if (error) {
+    return;
+  }
+  return data;
+}
 export async function ReportInventarioValorado(p) {
   const { data, error } = await supabase.rpc("inventariovalorado",p)
   

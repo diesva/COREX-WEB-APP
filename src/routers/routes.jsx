@@ -16,7 +16,11 @@ import {
   StockBajoMinimo,
   KardexEntradaSalida,
   StockInventarioValorado,
+  KardexSalida,
+  KardexEntrada,
+  
 } from "../index";
+
 
 import StockActualTodos from "../components/organismos/report/StockActualTodos";
 import { Layout } from "../hooks/Layout";
@@ -131,6 +135,14 @@ export function MyRoutes() {
         <Route
           path="kardex-entradas-salidas"
           element={<KardexEntradaSalida />}
+        />
+        <Route
+          path="kardex-salidas"
+          element={<KardexSalida />}
+        />
+        <Route
+          path="kardex-entradas"
+          element={<KardexEntrada />}
         />
         <Route
           path="inventario-valorado"

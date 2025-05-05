@@ -70,6 +70,14 @@ export const useProductosStore = create((set, get) => ({
     const response = await ReportKardexEntradaSalida(p);
     return response;
   },
+  reportKardexSalida: async (p) => {
+    const response = await ReportKardexSalida(p);
+    return response;
+  },
+  reportKardexEntrada: async (p) => {
+    const response = await ReportKardexEntrada(p);
+    return response;
+  },
   reportInventarioValorado: async (p) => {
     const response = await ReportInventarioValorado(p);
     return response;
