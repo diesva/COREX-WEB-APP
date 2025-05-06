@@ -27,6 +27,8 @@ export function TablaProductos({
   if (data?.length == 0) return;
   const [pagina, setPagina] = useState(1);
   const [datas, setData] = useState(data);
+  //
+  //
   const [columnFilters, setColumnFilters] = useState([]);
 
   const { eliminarProductos } = useProductosStore();
@@ -53,23 +55,11 @@ export function TablaProductos({
   }
   const columns = [
     {
-      accessorKey: "descripcion",
-      header: "Descripcion",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },
-
-    {
-      accessorKey: "stock_minimo",
-      header: "Stock min",
+      accessorKey: "codigointerno",
+      header: "Codigo Patrimonio",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Stock" className="ContentCell">
+        <td data-title="Precio venta" className="ContentCell">
           <span>{info.getValue()}</span>
         </td>
       ),
@@ -80,6 +70,35 @@ export function TablaProductos({
         return filterStatuses.includes(status?.id);
       },
     },
+    
+    {
+      accessorKey: "descripcion",
+      header: "Descripcion",
+      cell: (info) => <span>{info.getValue()}</span>,
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const status = row.getValue(columnId);
+        return filterStatuses.includes(status?.id);
+      },
+    },
+    {
+      accessorKey: "codigobarras",
+      header: "Cuenta Contable",
+      enableSorting: false,
+      cell: (info) => (
+        <td data-title="Cod. barras" className="ContentCell">
+          <span>{info.getValue()}</span>
+        </td>
+      ),
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const status = row.getValue(columnId);
+        return filterStatuses.includes(status?.id);
+      },
+    },
+    
     {
       accessorKey: "categoria",
       header: "Categoria",
@@ -108,8 +127,24 @@ export function TablaProductos({
       },
     },
     {
+      accessorKey: "stock",
+      header: "Stock Actual",
+      enableSorting: false,
+      cell: (info) => (
+        <td data-title="Stock" className="ContentCell">
+          <span>{info.getValue()}</span>
+        </td>
+      ),
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const status = row.getValue(columnId);
+        return filterStatuses.includes(status?.id);
+      },
+    },
+    /*{
       accessorKey: "codigobarras",
-      header: "Cod.barras",
+      header: "Cuenta Contable",
       enableSorting: false,
       cell: (info) => (
         <td data-title="Cod. barras" className="ContentCell">
@@ -122,39 +157,55 @@ export function TablaProductos({
         const status = row.getValue(columnId);
         return filterStatuses.includes(status?.id);
       },
-    },
-    {
-      accessorKey: "precioventa",
-      header: "Pr. venta",
-      enableSorting: false,
-      cell: (info) => (
-        <td data-title="Precio venta" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
-      ),
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },
+    },*/
     {
       accessorKey: "preciocompra",
-      header: "Pr. de compra",
+      header: "Precio Unitario",
       enableSorting: false,
-      cell: (info) => (
-        <td data-title="Precio compra" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
-      ),
+      cell: (info) => {
+        const valor = parseFloat(info.getValue() || 0);
+        const precioFormateado = new Intl.NumberFormat("es-PE", {
+          style: "currency",
+          currency: "PEN",
+          minimumFractionDigits: 2,
+        }).format(valor);
+        return (
+          <td data-title="Precio Unitario" className="ContentCell">
+            <span>{precioFormateado}</span>
+          </td>
+        );
+      },
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
         if (filterStatuses.length === 0) return true;
         const status = row.getValue(columnId);
         return filterStatuses.includes(status?.id);
       },
+    
     },
+    {
+      //accessorKey: "",
+      
+      
+        header: "Precio total",
+        enableSorting: false,
+        cell: (info) => {
+          const { stock, preciocompra } = info.row.original;
+          const total = parseFloat(stock || 0) * parseFloat(preciocompra || 0);
+          const totalFormateado = new Intl.NumberFormat("es-PE", {
+            style: "currency",
+            currency: "PEN",
+            minimumFractionDigits: 2,
+          }).format(total);
+          return (
+            <td data-title="Precio total" className="ContentCell">
+              <span>{totalFormateado}</span>
+            </td>
+          );
+        },
+        enableColumnFilter: false,
+      },
+      
     {
       accessorKey: "acciones",
       header: "",

@@ -24,12 +24,15 @@ function KardexEntradaSalida() {
     buscarProductos,
     buscador,
     setBuscador,
+    //NUEVO
+    addProductoItem, 
+    //FIN
     selectProductos,
     productoItemSelect,
   } = useProductosStore();
   const { dataempresa } = useEmpresaStore();
 
-  const { data, isLoading, error } = useQuery({
+  /*const { data, isLoading, error } = useQuery({
     
     queryKey: [
       "reporte kardex entrada salida",
@@ -42,7 +45,26 @@ function KardexEntradaSalida() {
         _id_producto: productoItemSelect?.id,
       }),
     enabled: !!dataempresa,
+  });*/
+  console.log("Producto seleccionado:", productoItemSelect);
+
+  const { data: dataKardex = [] } = useQuery({
+    queryKey: ["reporte kardex entrada salida", productoItemSelect.map(p => p.id)],
+    queryFn: async () => {
+      const responses = await Promise.all(
+        productoItemSelect.map(p =>
+          reportKardexEntradaSalida({
+            _id_empresa: dataempresa?.id,
+            _id_producto: p.id,
+          })
+        )
+      );
+      return responses;
+    },
+    enabled: !!dataempresa && productoItemSelect.length > 0,
   });
+  
+  
 
   const {
     data: dataproductosbuscador,
@@ -52,7 +74,7 @@ function KardexEntradaSalida() {
     queryKey: [
       "buscar productos",
       { id_empresa: dataempresa?.id, descripcion: buscador },
-      console.log("Kardex data", data)
+      
 
     ],
     queryFn: () =>
@@ -147,16 +169,22 @@ function KardexEntradaSalida() {
         funcion={() => setstateListaProductos(!stateListaproductos)}
         setBuscador={setBuscador}
       />
+            <BuscadorContainer>
+              
+            
+      
       {stateListaproductos && (
         <ListaGenerica
           funcion={(p) => {
-            selectProductos(p);
+            //selectProductos(p);
+            addProductoItem(p); // ✅ agregar al array
             setBuscador("");
           }}
           setState={() => setstateListaProductos(!stateListaproductos)}
           data={dataproductosbuscador?.slice(0, 3)} // 🔍 solo 3 productos sugeridos
         />
       )}
+                  </BuscadorContainer>
 
       <PDFViewer className="pdfviewer">
         <Document title="Reporte de stock todos">
@@ -174,8 +202,9 @@ function KardexEntradaSalida() {
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  fontSize: 8,
+                  fontSize: 6,
                   marginBottom: 10,
+                  textAlign: "left",
                 }}
               >
                 <View style={{ width: "48%" }}>
@@ -192,7 +221,8 @@ function KardexEntradaSalida() {
                 </View>
                 <View style={{ width: "20%" }}>
                   <Text>Fecha: {formattedDate}</Text>
-                  <Text>Solicitante: {data?.[0]?.nombres || "Usuario X"}</Text>
+                  <Text>Solicitante: {dataKardex?.[0]?.[0]?.nombres || "Usuario X"}</Text>
+
                 </View>
               </View>
 </View>
@@ -228,8 +258,8 @@ function KardexEntradaSalida() {
                 {renderTableRow(
                   {
                     nombres: "Usuario",
-                    codigobarras: "Codigo Barras ",
-                    codigointerno: "Codigo Interno",
+                    codigobarras: "Cuenta Contable",
+                    codigointerno: "Codigo Patrimonio",
                     descripcion: "Producto",
                     tipo: "Tipo",
                     cantidad: "Cantidad",
@@ -238,9 +268,28 @@ function KardexEntradaSalida() {
                   },
                   true
                 )}
-                {data?.slice(0, 99).map((movement, index) =>
-                  renderTableRow(movement)
-                )}
+                
+
+
+
+                {dataKardex.length > 0 &&
+  dataKardex.map((movimientos, i) => {
+    const ultimaSalida = movimientos
+      .filter((m) => m.tipo === "salida")
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+    return ultimaSalida ? renderTableRow(ultimaSalida) : null;
+  })
+}
+
+
+
+
+
+
+
+
+
+                
               </View>
 
               <View
@@ -250,10 +299,15 @@ function KardexEntradaSalida() {
                   marginTop: 10,
                 }}
               >
-                <Text style={{ fontSize: 10, fontWeight: "bold" }}>
-                  Total movimientos mostrados: {Math.min(data?.length || 0, 99999)}
-                  
-                </Text>
+<Text style={{ fontSize: 10, fontWeight: "bold" }}>
+  Total movimientos mostrados: {
+    dataKardex.filter((movimientos) =>
+      movimientos.some((m) => m.tipo === "SALIDA")
+    ).length
+  }
+</Text>
+
+
               </View>
             </View>
           </Page>
@@ -272,6 +326,22 @@ const Container = styled.div`
   .pdfviewer {
     width: 100%;
     height: 100%;
+  }
+`;
+const BuscadorContainer = styled.div`
+  position: relative;
+  width: 100%;
+
+  > div {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: ${(props) => props.theme.bg};
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
   }
 `;
 

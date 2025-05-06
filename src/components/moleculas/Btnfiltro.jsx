@@ -2,7 +2,7 @@ import styled from "styled-components";
 export function Btnfiltro({ bgcolor, textcolor, icono, funcion }) {
   return (
     <Container $textcolor={textcolor} $bgcolor={bgcolor} onClick={funcion}>
-      <div classNameeName="contentIcon">
+      <div className="contentIcon">
         <span>{icono}</span>
       </div>
     </Container>

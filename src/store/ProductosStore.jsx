@@ -16,7 +16,27 @@ export const useProductosStore = create((set, get) => ({
     set({ buscador: p });
   },
   dataproductos: [],
+  //NUEVA MODIFICACION PARA SELECCIONAR VARIOS PRODUCTOS
   productoItemSelect: [],
+
+addProductoItem: (producto) => {
+  set((state) => {
+    const yaExiste = state.productoItemSelect.some(p => p.id === producto.id);
+    if (yaExiste) return state;
+    return { productoItemSelect: [...state.productoItemSelect, producto] };
+  });
+},
+
+removeProductoItem: (id) => {
+  set((state) => ({
+    productoItemSelect: state.productoItemSelect.filter(p => p.id !== id),
+  }));
+},
+
+clearProductoItems: () => {
+  set({ productoItemSelect: [] });
+},
+// FIN
   parametros: {},
   mostrarProductos: async (p) => {
     const response = await MostrarProductos(p);
