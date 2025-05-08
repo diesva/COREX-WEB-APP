@@ -31,6 +31,17 @@ function KardexEntradaSalida() {
     productoItemSelect,
   } = useProductosStore();
   const { dataempresa } = useEmpresaStore();
+  //DATOS:
+  const [dependencia, setDependencia] = useState("");
+const [solicitaEntrega, setSolicitaEntrega] = useState("");
+const [destino, setDestino] = useState("");
+const [referencia, setReferencia] = useState("");
+const [ctaMayor, setCtaMayor] = useState("");
+const [programa, setPrograma] = useState("");
+const [subPrograma, setSubPrograma] = useState("");
+const [meta, setMeta] = useState("");
+
+
 
   /*const { data, isLoading, error } = useQuery({
     
@@ -133,34 +144,55 @@ function KardexEntradaSalida() {
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
-  const renderTableRow = (rowData, isHeader = false) => (
+  const renderTableRow = (rowData, isHeader = false, index = null) => (
     <View style={styles.row} key={rowData.id || Math.random()}>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.nombres}
-      </Text>
-      <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.codigobarras}
+        {isHeader ? "N°" : index + 1}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
         {rowData.codigointerno}
       </Text>
+      <Text style={[styles.cell, isHeader && styles.headerCell]}>
+        {rowData.stock}
+      </Text>
       <Text style={[styles.descripcionCell, isHeader && styles.headerCell]}>
         {rowData.descripcion}
       </Text>
+      {/*<Text style={[styles.cell, isHeader && styles.headerCell]}>
+        {rowData.nombres}
+      </Text>*/}
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.tipo}
+        {rowData.codigobarras}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
         {rowData.cantidad}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.fecha}
+  {String(rowData.preciocompra ?? "")}
+</Text>
+<Text style={[styles.cell, isHeader && styles.headerCell]}>
+  {isHeader
+    ? "Total"
+    : rowData.cantidad && rowData.preciocompra
+    ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    : ""}
+</Text>
+
+
+
+      {/*<Text style={[styles.cell, isHeader && styles.headerCell]}>
+        {rowData.tipo}
       </Text>
+      
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {rowData.stock}
-      </Text>
+        {rowData.fecha}
+      </Text>*/}
     </View>
   );
+  
   
 
   return (
@@ -185,6 +217,80 @@ function KardexEntradaSalida() {
         />
       )}
                   </BuscadorContainer>
+                  
+
+
+
+                  <div style={{ display: "flex", gap: "30px", flexWrap: "wrap" }}>
+  <div style={{ flex: 1, minWidth: "300px" }}>
+    <FormInputGroup>
+      <label>Dependencia solicitante:</label>
+      <select value={dependencia} onChange={(e) => setDependencia(e.target.value)}>
+        <option value="">-- Seleccione --</option>
+        <option>Área de Liquidaciones</option>
+<option>Cuna Jardín San Gerónimo</option>
+<option>Gerencia General Regional</option>
+<option>Gerencia Sub Regional</option>
+<option>Oficina Sub Regional de Administración</option>
+<option>Oficina Sub Regional de Asesoría Jurídica</option>
+<option>Oficina Sub Regional de Planeamiento y Presupuesto</option>
+<option>Oficina Sub Regional de Supervisión</option>
+<option>Órgano de Control Institucional</option>
+<option>Programa de Mantenimiento de Insfraestructura</option>
+<option>Sub Gerencia de Desarrollo Económico Social y Ambiental</option>
+<option>Sub Gerencia de Infraestructura Pública</option>
+<option>Unidad de Almacén</option>
+<option>Unidad de Contabilidad</option>
+<option>Unidad de Formulación y Estudios</option>
+<option>Unidad de Informática</option>
+<option>Unidad de Logística</option>
+<option>Unidad de Patrimonio</option>
+<option>Unidad de Recursos Humanos</option>
+<option>Unidad de Tesorería</option>
+
+        
+      </select>
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Solicito Entregar a:</label>
+      <input type="text" value={solicitaEntrega} onChange={(e) => setSolicitaEntrega(e.target.value)} />
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Con Destino a:</label>
+      <input type="text" value={destino} onChange={(e) => setDestino(e.target.value)} />
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Referencia:</label>
+      <input type="text" value={referencia} onChange={(e) => setReferencia(e.target.value)} />
+    </FormInputGroup>
+  </div>
+
+  <div style={{ flex: 1, minWidth: "300px" }}>
+    <FormInputGroup>
+      <label>Cuenta Mayor:</label>
+      <input type="text" value={ctaMayor} onChange={(e) => setCtaMayor(e.target.value)} />
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Programa:</label>
+      <input type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} />
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Sub-Programa:</label>
+      <input type="text" value={subPrograma} onChange={(e) => setSubPrograma(e.target.value)} />
+    </FormInputGroup>
+
+    <FormInputGroup>
+      <label>Meta:</label>
+      <input type="text" value={meta} onChange={(e) => setMeta(e.target.value)} />
+    </FormInputGroup>
+  </div>
+</div>
+
 
       <PDFViewer className="pdfviewer">
         <Document title="Reporte de stock todos">
@@ -219,9 +325,9 @@ function KardexEntradaSalida() {
                   <Text>AV. VENECIA N°222</Text>
                   <Text>RUC: 20532480397</Text>
                 </View>
-                <View style={{ width: "20%" }}>
+                <View style={{ width: "10%" }}>
                   <Text>Fecha: {formattedDate}</Text>
-                  <Text>Solicitante: {dataKardex?.[0]?.[0]?.nombres || "Usuario X"}</Text>
+                  <Text>Generado por: {dataKardex?.[0]?.[0]?.nombres || "Usuario X"}</Text>
 
                 </View>
               </View>
@@ -252,22 +358,37 @@ function KardexEntradaSalida() {
               >
 
                 </View>
-              
+                <View style={{ marginBottom: 10, fontSize: 8 }}>
+  <Text>Dependencia Solicitante: {dependencia}</Text>
+  <Text>Solicito Entregar a: {solicitaEntrega}</Text>
+  <Text>Con Destino a: {destino}</Text>
+  <Text>Referencia: {referencia}</Text>
+  <Text>Cuenta Mayor: {ctaMayor}</Text>
+  <Text>Programa: {programa}</Text>
+  <Text>Sub-Programa: {subPrograma}</Text>
+  <Text>Meta: {meta}</Text>
+</View>
+
+
 
               <View style={styles.table}>
-                {renderTableRow(
-                  {
-                    nombres: "Usuario",
-                    codigobarras: "Cuenta Contable",
-                    codigointerno: "Codigo Patrimonio",
-                    descripcion: "Producto",
-                    tipo: "Tipo",
-                    cantidad: "Cantidad",
-                    fecha: "Fecha",
-                    stock: "Stock",
-                  },
-                  true
-                )}
+              {renderTableRow(
+  {
+    nombres: "Usuario",
+    codigointerno: "Codigo Patrimonio",
+    stock: "Stock",
+    descripcion: "Producto",
+    codigobarras: "Cuenta Contable",
+    cantidad: "Cantidad",
+    preciocompra: "Precio Unitario",   
+    tipo: "Tipo",
+    fecha: "Fecha",
+    total: "Total",
+    
+  },
+  true
+)}
+
                 
 
 
@@ -319,7 +440,7 @@ function KardexEntradaSalida() {
 
 const Container = styled.div`
   width: 100%;
-  height: 80vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -344,5 +465,37 @@ const BuscadorContainer = styled.div`
     overflow: hidden;
   }
 `;
+const FormInputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  label {
+    font-size: 14px;
+    color: ${(props) => props.theme.text};
+  }
+
+  input,
+  select {
+    background-color: ${(props) => props.theme.bg};
+    color: ${(props) => props.theme.text};
+    border: 1px solid #414244;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  select:focus {
+    outline: none;
+  }
+    
+`;
+
 
 export default KardexEntradaSalida;
+//COLOCAR N SELECT BOX PARA VER LA UNIDAD O EL META

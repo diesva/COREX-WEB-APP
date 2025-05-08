@@ -122,3 +122,4 @@ export * from './utils/dataEstatica';
 export * from './store/reportesPersonalizados';
 export { default as KardexSalida } from './components/organismos/report/KardexSalida';
 export { default as KardexEntrada } from './components/organismos/report/KardexEntrada';
+
