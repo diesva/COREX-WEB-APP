@@ -168,11 +168,19 @@ const [meta, setMeta] = useState("");
         {rowData.cantidad}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-  {String(rowData.preciocompra ?? "")}
+  {isHeader
+    ? "PREC.UNIT."
+    : rowData.preciocompra
+    ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    : ""}
 </Text>
+
 <Text style={[styles.cell, isHeader && styles.headerCell]}>
   {isHeader
-    ? "Total"
+    ? "TOTAL"
     : rowData.cantidad && rowData.preciocompra
     ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
         minimumFractionDigits: 2,
@@ -209,11 +217,11 @@ const [meta, setMeta] = useState("");
         <ListaGenerica
           funcion={(p) => {
             //selectProductos(p);
-            addProductoItem(p); // ✅ agregar al array
+            addProductoItem(p); //  agregar al array
             setBuscador("");
           }}
           setState={() => setstateListaProductos(!stateListaproductos)}
-          data={dataproductosbuscador?.slice(0, 3)} // 🔍 solo 3 productos sugeridos
+          data={dataproductosbuscador?.slice(0, 3)} //  solo 3 productos sugeridos
         />
       )}
                   </BuscadorContainer>
@@ -358,15 +366,19 @@ const [meta, setMeta] = useState("");
               >
 
                 </View>
-                <View style={{ marginBottom: 10, fontSize: 8 }}>
-  <Text>Dependencia Solicitante: {dependencia}</Text>
-  <Text>Solicito Entregar a: {solicitaEntrega}</Text>
-  <Text>Con Destino a: {destino}</Text>
-  <Text>Referencia: {referencia}</Text>
-  <Text>Cuenta Mayor: {ctaMayor}</Text>
-  <Text>Programa: {programa}</Text>
-  <Text>Sub-Programa: {subPrograma}</Text>
-  <Text>Meta: {meta}</Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", fontSize: 8, marginBottom: 10 }}>
+  <View style={{ width: "48%" }}>
+    <Text>Dependencia Solicitante: {dependencia}</Text>
+    <Text>Solicito Entregar a: {solicitaEntrega}</Text>
+    <Text>Con Destino a: {destino}</Text>
+    <Text>Referencia: {referencia}</Text>
+  </View>
+  <View style={{ width: "30%" }}>
+    <Text>Cuenta Mayor: {ctaMayor}</Text>
+    <Text>Programa: {programa}</Text>
+    <Text>Sub-Programa: {subPrograma}</Text>
+    <Text>Meta: {meta}</Text>
+  </View>
 </View>
 
 
@@ -375,12 +387,12 @@ const [meta, setMeta] = useState("");
               {renderTableRow(
   {
     nombres: "Usuario",
-    codigointerno: "Codigo Patrimonio",
-    stock: "Stock",
-    descripcion: "Producto",
-    codigobarras: "Cuenta Contable",
-    cantidad: "Cantidad",
-    preciocompra: "Precio Unitario",   
+    codigointerno: "CÓDIGO",
+    stock: "CANTIDAD",
+    descripcion: "DESCRIPCIÓN",
+    codigobarras: "CUENTA",
+    cantidad: "CANT. DESP.",
+    preciocompra: "PREC.UNIT.",   
     tipo: "Tipo",
     fecha: "Fecha",
     total: "Total",
@@ -396,7 +408,7 @@ const [meta, setMeta] = useState("");
                 {dataKardex.length > 0 &&
   dataKardex.map((movimientos, i) => {
     const ultimaSalida = movimientos
-      .filter((m) => m.tipo === "salida")
+      .filter((m) => m.tipo === "entrada")
       .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
     return ultimaSalida ? renderTableRow(ultimaSalida) : null;
   })
@@ -420,13 +432,13 @@ const [meta, setMeta] = useState("");
                   marginTop: 10,
                 }}
               >
-<Text style={{ fontSize: 10, fontWeight: "bold" }}>
+{/*<Text style={{ fontSize: 10, fontWeight: "bold" }}>
   Total movimientos mostrados: {
     dataKardex.filter((movimientos) =>
       movimientos.some((m) => m.tipo === "SALIDA")
     ).length
   }
-</Text>
+</Text>*/}
 
 
               </View>

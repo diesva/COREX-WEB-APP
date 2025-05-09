@@ -249,7 +249,7 @@ function KardexSalida() {
               >
                 <Text style={{ fontSize: 10, fontWeight: "bold" }}>
   Total movimientos mostrados: {
-    data?.filter((item) => item.tipo === "salida").length || 0
+    data?.filter((item) => item.tipo === "entrada").length || 0
   }
 </Text>
 

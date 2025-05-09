@@ -45,24 +45,37 @@ const [estadoProceso, setEstadoproceso] = useState(false); // loader + bloqueo
 
 async function insertar(data) {
   try {
-    setEstadoproceso(true); // 👈 Bloquea botón y muestra loader INMEDIATAMENTE
+    const cantidad = parseFloat(data.cantidad);
+    const stockActual = productoItemSelect.stock;
+
+    if (isNaN(cantidad) || cantidad < 0) {
+      alert("La cantidad no puede ser menor a cero.");
+      return;
+    }
+
+    if (tipo === "salida" && cantidad > stockActual) {
+      alert("La cantidad no puede ser mayor al stock disponible.");
+      return;
+    }
+
+    setEstadoproceso(true); // 👈 Bloquea botón y muestra loader
 
     const p = {
       fecha: new Date(),
       tipo: tipo,
       id_usuario: idusuario,
       id_producto: productoItemSelect.id,
-      cantidad: parseFloat(data.cantidad),
+      cantidad: cantidad,
       detalle: data.detalle,
       id_empresa: dataempresa.id,
     };
 
     await insertarKardex(p);
 
-    // Espera un poco para UX y recarga
+    // UX: breve espera y recarga
     setTimeout(() => {
-      window.location.reload(); // 👈 Refresca
-    }, 300);
+      window.location.reload();
+    }, 500);
 
   } catch (err) {
     console.error(err);
@@ -70,6 +83,7 @@ async function insertar(data) {
     setEstadoproceso(false);
   }
 }
+
 
  
   return (
