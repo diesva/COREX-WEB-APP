@@ -25,7 +25,7 @@ function KardexEntradaSalida() {
     buscador,
     setBuscador,
     //NUEVO
-    addProductoItem, 
+    addProductoItem,
     //FIN
     selectProductos,
     productoItemSelect,
@@ -33,15 +33,13 @@ function KardexEntradaSalida() {
   const { dataempresa } = useEmpresaStore();
   //DATOS:
   const [dependencia, setDependencia] = useState("");
-const [solicitaEntrega, setSolicitaEntrega] = useState("");
-const [destino, setDestino] = useState("");
-const [referencia, setReferencia] = useState("");
-const [ctaMayor, setCtaMayor] = useState("");
-const [programa, setPrograma] = useState("");
-const [subPrograma, setSubPrograma] = useState("");
-const [meta, setMeta] = useState("");
-
-
+  const [solicitaEntrega, setSolicitaEntrega] = useState("");
+  const [destino, setDestino] = useState("");
+  const [referencia, setReferencia] = useState("");
+  const [ctaMayor, setCtaMayor] = useState("");
+  const [programa, setPrograma] = useState("");
+  const [subPrograma, setSubPrograma] = useState("");
+  const [meta, setMeta] = useState("");
 
   /*const { data, isLoading, error } = useQuery({
     
@@ -74,8 +72,36 @@ const [meta, setMeta] = useState("");
     },
     enabled: !!dataempresa && productoItemSelect.length > 0,
   });
+
+    
+  const resumenCuentas = {};
+dataKardex.forEach(movimientos => {
+  const salidasUnicas = {};
+  movimientos.forEach(m => {
+    if (m.tipo === "salida") {
+      const cuenta = m.codigobarras || "SIN CUENTA";
+      if (!salidasUnicas[cuenta]) {
+        const cantidad = parseFloat(m.cantidad);
+        const precio = parseFloat(m.preciocompra);
+        const total = cantidad * precio;
+        salidasUnicas[cuenta] = isNaN(total) ? 0 : total;
+      }
+    }
+  });
+  Object.entries(salidasUnicas).forEach(([cuenta, total]) => {
+    if (!resumenCuentas[cuenta]) resumenCuentas[cuenta] = 0;
+    resumenCuentas[cuenta] += total;
+  });
+});
+const totalResumen = Object.values(resumenCuentas).reduce((acc, curr) => acc + curr, 0);
+    
   
-  
+/*const totalGeneral = dataKardex.flat().reduce((acc, item) => {
+  const cantidad = parseFloat(item.cantidad);
+  const precio = parseFloat(item.preciocompra);
+  return acc + (isNaN(cantidad * precio) ? 0 : cantidad * precio);
+}, 0);
+*/
 
   const {
     data: dataproductosbuscador,
@@ -85,8 +111,6 @@ const [meta, setMeta] = useState("");
     queryKey: [
       "buscar productos",
       { id_empresa: dataempresa?.id, descripcion: buscador },
-      
-
     ],
     queryFn: () =>
       buscarProductos({
@@ -138,16 +162,16 @@ const [meta, setMeta] = useState("");
       borderLeft: 1,
       borderLeftColor: "#000",
     },
-    
+
   });
-  
+
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
   const renderTableRow = (rowData, isHeader = false, index = null) => (
     <View style={styles.row} key={rowData.id || Math.random()}>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-        {isHeader ? "N°" : index + 1}
+        {isHeader ? "ITEM" : index + 1}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
         {rowData.codigointerno}
@@ -168,29 +192,26 @@ const [meta, setMeta] = useState("");
         {rowData.cantidad}
       </Text>
       <Text style={[styles.cell, isHeader && styles.headerCell]}>
-  {isHeader
-    ? "PREC.UNIT."
-    : rowData.preciocompra
-    ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`
-    : ""}
-</Text>
+        {isHeader
+          ? "PREC.UNIT."
+          : rowData.preciocompra
+            ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`
+            : ""}
+      </Text>
 
-<Text style={[styles.cell, isHeader && styles.headerCell]}>
-  {isHeader
-    ? "TOTAL"
-    : rowData.cantidad && rowData.preciocompra
-    ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`
-    : ""}
-</Text>
-
-
-
+      <Text style={[styles.cell, isHeader && styles.headerCell]}>
+        {isHeader
+          ? "TOTAL"
+          : rowData.cantidad && rowData.preciocompra
+            ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`
+            : ""}
+      </Text>
       {/*<Text style={[styles.cell, isHeader && styles.headerCell]}>
         {rowData.tipo}
       </Text>
@@ -200,117 +221,104 @@ const [meta, setMeta] = useState("");
       </Text>*/}
     </View>
   );
-  
-  
-
   return (
     <Container>
       <Buscador
         funcion={() => setstateListaProductos(!stateListaproductos)}
         setBuscador={setBuscador}
       />
-            <BuscadorContainer>
-              
-            
-      
-      {stateListaproductos && (
-        <ListaGenerica
-          funcion={(p) => {
-            //selectProductos(p);
-            addProductoItem(p); //  agregar al array
-            setBuscador("");
-          }}
-          setState={() => setstateListaProductos(!stateListaproductos)}
-          data={dataproductosbuscador?.slice(0, 3)} //  solo 3 productos sugeridos
-        />
-      )}
-                  </BuscadorContainer>
-                  
+      <BuscadorContainer>
+        {stateListaproductos && (
+          <ListaGenerica
+            funcion={(p) => {
+              //selectProductos(p);
+              addProductoItem(p); //  agregar al array
+              setBuscador("");
+            }}
+            setState={() => setstateListaProductos(!stateListaproductos)}
+            data={dataproductosbuscador?.slice(0, 3)} //  solo 3 productos sugeridos
+          />
+        )}
+      </BuscadorContainer>
+      <div style={{ display: "flex", gap: "30px", flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: "300px" }}>
+          <FormInputGroup>
+            <label>Dependencia solicitante:</label>
+            <select value={dependencia} onChange={(e) => setDependencia(e.target.value)}>
+              <option value="">-- Seleccione --</option>
+              <option>Área de Liquidaciones</option>
+              <option>Cuna Jardín San Gerónimo</option>
+              <option>Gerencia General Regional</option>
+              <option>Gerencia Sub Regional</option>
+              <option>Oficina Sub Regional de Administración</option>
+              <option>Oficina Sub Regional de Asesoría Jurídica</option>
+              <option>Oficina Sub Regional de Planeamiento y Presupuesto</option>
+              <option>Oficina Sub Regional de Supervisión</option>
+              <option>Órgano de Control Institucional</option>
+              <option>Programa de Mantenimiento de Insfraestructura</option>
+              <option>Sub Gerencia de Desarrollo Económico Social y Ambiental</option>
+              <option>Sub Gerencia de Infraestructura Pública</option>
+              <option>Unidad de Almacén</option>
+              <option>Unidad de Contabilidad</option>
+              <option>Unidad de Formulación y Estudios</option>
+              <option>Unidad de Informática</option>
+              <option>Unidad de Logística</option>
+              <option>Unidad de Patrimonio</option>
+              <option>Unidad de Recursos Humanos</option>
+              <option>Unidad de Tesorería</option>
+            </select>
+          </FormInputGroup>
 
+          <FormInputGroup>
+            <label>Solicito Entregar a:</label>
+            <input type="text" value={solicitaEntrega} onChange={(e) => setSolicitaEntrega(e.target.value)} />
+          </FormInputGroup>
 
+          <FormInputGroup>
+            <label>Con Destino a:</label>
+            <input type="text" value={destino} onChange={(e) => setDestino(e.target.value)} />
+          </FormInputGroup>
 
-                  <div style={{ display: "flex", gap: "30px", flexWrap: "wrap" }}>
-  <div style={{ flex: 1, minWidth: "300px" }}>
-    <FormInputGroup>
-      <label>Dependencia solicitante:</label>
-      <select value={dependencia} onChange={(e) => setDependencia(e.target.value)}>
-        <option value="">-- Seleccione --</option>
-        <option>Área de Liquidaciones</option>
-<option>Cuna Jardín San Gerónimo</option>
-<option>Gerencia General Regional</option>
-<option>Gerencia Sub Regional</option>
-<option>Oficina Sub Regional de Administración</option>
-<option>Oficina Sub Regional de Asesoría Jurídica</option>
-<option>Oficina Sub Regional de Planeamiento y Presupuesto</option>
-<option>Oficina Sub Regional de Supervisión</option>
-<option>Órgano de Control Institucional</option>
-<option>Programa de Mantenimiento de Insfraestructura</option>
-<option>Sub Gerencia de Desarrollo Económico Social y Ambiental</option>
-<option>Sub Gerencia de Infraestructura Pública</option>
-<option>Unidad de Almacén</option>
-<option>Unidad de Contabilidad</option>
-<option>Unidad de Formulación y Estudios</option>
-<option>Unidad de Informática</option>
-<option>Unidad de Logística</option>
-<option>Unidad de Patrimonio</option>
-<option>Unidad de Recursos Humanos</option>
-<option>Unidad de Tesorería</option>
+          <FormInputGroup>
+            <label>Referencia:</label>
+            <input type="text" value={referencia} onChange={(e) => setReferencia(e.target.value)} />
+          </FormInputGroup>
+        </div>
 
-        
-      </select>
-    </FormInputGroup>
+        <div style={{ flex: 1, minWidth: "300px" }}>
+          <FormInputGroup>
+            <label>Cuenta Mayor:</label>
+            <input type="text" value={ctaMayor} onChange={(e) => setCtaMayor(e.target.value)} />
+          </FormInputGroup>
 
-    <FormInputGroup>
-      <label>Solicito Entregar a:</label>
-      <input type="text" value={solicitaEntrega} onChange={(e) => setSolicitaEntrega(e.target.value)} />
-    </FormInputGroup>
+          <FormInputGroup>
+            <label>Programa:</label>
+            <input type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} />
+          </FormInputGroup>
 
-    <FormInputGroup>
-      <label>Con Destino a:</label>
-      <input type="text" value={destino} onChange={(e) => setDestino(e.target.value)} />
-    </FormInputGroup>
+          <FormInputGroup>
+            <label>Sub-Programa:</label>
+            <input type="text" value={subPrograma} onChange={(e) => setSubPrograma(e.target.value)} />
+          </FormInputGroup>
 
-    <FormInputGroup>
-      <label>Referencia:</label>
-      <input type="text" value={referencia} onChange={(e) => setReferencia(e.target.value)} />
-    </FormInputGroup>
-  </div>
-
-  <div style={{ flex: 1, minWidth: "300px" }}>
-    <FormInputGroup>
-      <label>Cuenta Mayor:</label>
-      <input type="text" value={ctaMayor} onChange={(e) => setCtaMayor(e.target.value)} />
-    </FormInputGroup>
-
-    <FormInputGroup>
-      <label>Programa:</label>
-      <input type="text" value={programa} onChange={(e) => setPrograma(e.target.value)} />
-    </FormInputGroup>
-
-    <FormInputGroup>
-      <label>Sub-Programa:</label>
-      <input type="text" value={subPrograma} onChange={(e) => setSubPrograma(e.target.value)} />
-    </FormInputGroup>
-
-    <FormInputGroup>
-      <label>Meta:</label>
-      <input type="text" value={meta} onChange={(e) => setMeta(e.target.value)} />
-    </FormInputGroup>
-  </div>
-</div>
-
+          <FormInputGroup>
+            <label>Meta:</label>
+            <input type="text" value={meta} onChange={(e) => setMeta(e.target.value)} />
+          </FormInputGroup>
+        </div>
+      </div>
 
       <PDFViewer className="pdfviewer">
         <Document title="Reporte de stock todos">
           <Page size="A4" orientation="landscape" style={{ padding: 20 }}>
-            
-                            <Image
-                              src="../src/assets/GORE.png"
-                              style={{ width: 75, height: 50, marginBottom: 0 }}
-                            />
-                            
+
+            <Image
+              src="../src/assets/GORE.png"
+              style={{ width: 75, height: 50, marginBottom: 0 }}
+            />
+
             <View style={{ flexDirection: "column", width: "100%" }}>
-              
+
 
               <View
                 style={{
@@ -323,12 +331,12 @@ const [meta, setMeta] = useState("");
               >
                 <View style={{ width: "48%" }}>
                   <Text>UNIDAD EJECUTORA SUB REGION</Text>
-                  
+
                   <Text>
-                  DE DESARROLLO ILO N°003
+                    DE DESARROLLO ILO N°003
                   </Text>
                   <Text>
-                  ALMACEN CENTRAL
+                    ALMACEN CENTRAL
                   </Text>
                   <Text>AV. VENECIA N°222</Text>
                   <Text>RUC: 20532480397</Text>
@@ -339,9 +347,9 @@ const [meta, setMeta] = useState("");
 
                 </View>
               </View>
-</View>
-                    
-                            
+            </View>
+
+
             <View style={{ flexDirection: "column", width: "100%" }}>
               <Text
                 style={{
@@ -353,9 +361,9 @@ const [meta, setMeta] = useState("");
               >
                 PEDIDO COMPROBANTE DE SALIDA
               </Text>
-                <View style={{fontSize: 8, flexDirection: "column", width: "100%", textAlign: "center"}}>
-              <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
-                </View>
+              <View style={{ fontSize: 8, flexDirection: "column", width: "100%", textAlign: "center" }}>
+                <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
+              </View>
               <View
                 style={{
                   flexDirection: "row",
@@ -365,65 +373,85 @@ const [meta, setMeta] = useState("");
                 }}
               >
 
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", fontSize: 8, marginBottom: 10 }}>
+                <View style={{ width: "48%" }}>
+                  <Text>Dependencia Solicitante: {dependencia}</Text>
+                  <Text>Solicito Entregar a: {solicitaEntrega}</Text>
+                  <Text>Con Destino a: {destino}</Text>
+                  <Text>Referencia: {referencia}</Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", fontSize: 8, marginBottom: 10 }}>
-  <View style={{ width: "48%" }}>
-    <Text>Dependencia Solicitante: {dependencia}</Text>
-    <Text>Solicito Entregar a: {solicitaEntrega}</Text>
-    <Text>Con Destino a: {destino}</Text>
-    <Text>Referencia: {referencia}</Text>
+                <View style={{ width: "30%" }}>
+                  <Text>Cuenta Mayor: {ctaMayor}</Text>
+                  <Text>Programa: {programa}</Text>
+                  <Text>Sub-Programa: {subPrograma}</Text>
+                  <Text>Meta: {meta}</Text>
+                </View>
+              </View>
+              <View style={styles.table}>
+  {renderTableRow(
+    {
+      nombres: "Usuario",
+      codigointerno: "CÓDIGO",
+      stock: "CANTIDAD",
+      descripcion: "DESCRIPCIÓN",
+      codigobarras: "CUENTA",
+      cantidad: "CANT. DESP.",
+      preciocompra: "PREC.UNIT.",
+      tipo: "Tipo",
+      fecha: "Fecha",
+      total: "Total",
+    },
+    true
+  )}
+  {dataKardex.length > 0 &&
+    dataKardex
+      .map((movimientos) => {
+        const ultimaSalida = movimientos
+          .filter((m) => m.tipo === "salida")
+          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+        return ultimaSalida; // Devuelve ultimaSalida o undefined
+      })
+      .filter((ultimaSalida) => ultimaSalida !== undefined) // Filtra solo productos con salida
+      .map((ultimaSalida, i) => renderTableRow(ultimaSalida, false, i)) // Mapea con índice continuo
+  }
+</View>
+              
+              
+              <View style={{ marginTop: 30 }}>
+  <Text style={{ fontSize: 10, fontWeight: "bold", marginBottom: 5 }}>Resumen por Código de Cuenta</Text>
+
+  <View style={[styles.row, { backgroundColor: "#f0f0f0" }]}>
+    <Text style={[styles.cell, { fontWeight: "bold" }]}>Código Cuenta</Text>
+    <Text style={[styles.cell, { fontWeight: "bold" }]}>Total Precio (S/.)</Text>
   </View>
-  <View style={{ width: "30%" }}>
-    <Text>Cuenta Mayor: {ctaMayor}</Text>
-    <Text>Programa: {programa}</Text>
-    <Text>Sub-Programa: {subPrograma}</Text>
-    <Text>Meta: {meta}</Text>
+
+  {Object.entries(resumenCuentas).map(([codigo, total]) => (
+    <View key={codigo} style={styles.row}>
+      <Text style={styles.cell}>{codigo}</Text>
+      <Text style={styles.cell}>
+        S/. {total.toLocaleString("es-PE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </Text>
+    </View>
+  ))}
+
+  <View style={[styles.row, { marginTop: 10, backgroundColor: "#dcdcdc" }]}>
+    <Text style={[styles.cell, { fontWeight: "bold" }]}>TOTAL GENERAL</Text>
+    <Text style={[styles.cell, { fontWeight: "bold" }]}>
+      S/. {totalResumen.toLocaleString("es-PE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}
+    </Text>
   </View>
 </View>
 
 
 
-              <View style={styles.table}>
-              {renderTableRow(
-  {
-    nombres: "Usuario",
-    codigointerno: "CÓDIGO",
-    stock: "CANTIDAD",
-    descripcion: "DESCRIPCIÓN",
-    codigobarras: "CUENTA",
-    cantidad: "CANT. DESP.",
-    preciocompra: "PREC.UNIT.",   
-    tipo: "Tipo",
-    fecha: "Fecha",
-    total: "Total",
-    
-  },
-  true
-)}
 
-                
-
-
-
-                {dataKardex.length > 0 &&
-  dataKardex.map((movimientos, i) => {
-    const ultimaSalida = movimientos
-      .filter((m) => m.tipo === "entrada")
-      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
-    return ultimaSalida ? renderTableRow(ultimaSalida) : null;
-  })
-}
-
-
-
-
-
-
-
-
-
-                
-              </View>
 
               <View
                 style={{
@@ -432,14 +460,13 @@ const [meta, setMeta] = useState("");
                   marginTop: 10,
                 }}
               >
-{/*<Text style={{ fontSize: 10, fontWeight: "bold" }}>
+                {/*<Text style={{ fontSize: 10, fontWeight: "bold" }}>
   Total movimientos mostrados: {
     dataKardex.filter((movimientos) =>
       movimientos.some((m) => m.tipo === "SALIDA")
     ).length
   }
 </Text>*/}
-
 
               </View>
             </View>
