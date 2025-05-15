@@ -15,40 +15,59 @@ import {
   useProductosStore,
 } from "../../../index";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { destinos } from "../../../store/destinos";
 import SearchableSelect from "./SearchableSelect";
 import { supabase } from "../../../index";
 
+// Función para convertir números a texto
+const numberToText = (num) => {
+  const unidades = [
+    "CERO", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE",
+    "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISÉIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE"
+  ];
+  const decenas = [
+    "", "", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"
+  ];
+
+  if (num < 0) return "CERO";
+  if (num < 20) return unidades[num];
+  if (num < 100) {
+    const decena = Math.floor(num / 10);
+    const unidad = num % 10;
+    if (unidad === 0) return decenas[decena];
+    return `${decenas[decena]} Y ${unidades[unidad]}`;
+  }
+  return num.toString(); // Para números >= 100, devolvemos el número como string
+};
+
 // Estilos del PDF
 const styles = StyleSheet.create({
   page: { 
-    flexDirection: "column", 
-    padding: 30,
+    flexDirection: "column",
+    padding: 20,
     backgroundColor: "transparent",
   },
   image: {
-    width: 75,
-    height: 50,
-    marginBottom: 10,
+    width: 60,
+    height: 40,
+    marginBottom: 5,
     position: "relative",
     zIndex: 1,
   },
   boldText: {
     fontWeight: "bold",
     marginLeft: 10,
-    fontSize: 8,
+    fontSize: 6,
   },
   titleText: {
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 12,
     textAlign: "center",
-    marginBottom: 10,
-    marginLeft: 10,
   },
   table: { 
     width: "100%", 
-    marginTop: 10,
+    marginTop: 5,
     borderTop: 1,
     borderTopColor: "#000",
     borderRight: 1,
@@ -58,258 +77,258 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottom: 1,
     borderBottomColor: "#000",
-    minHeight: 20,
+    minHeight: 15,
     alignItems: "center",
   },
-  // Estilos base para celdas y encabezados
   cell: {
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   headerCell: {
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // ITEM
   itemCell: {
     width: 40,
     textAlign: "left",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   itemHeaderCell: {
     width: 40,
     textAlign: "left",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // CÓDIGO
   codigoCell: {
     width: 80,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   codigoHeaderCell: {
     width: 80,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // CANTIDAD
   cantidadCell: {
     width: 60,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   cantidadHeaderCell: {
     width: 60,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // DESCRIPCIÓN
   descripcionCell: {
-    width: 220,
+    width: 260,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   descripcionHeaderCell: {
-    width: 220,
+    width: 260,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // CUENTA
   cuentaCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   cuentaHeaderCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // CANT. DESPACHADA
   cantDespCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   cantDespHeaderCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // PREC.UNIT.
   precioUnitCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   precioUnitHeaderCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // TOTAL
   totalCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
   },
   totalHeaderCell: {
     width: 90,
     textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     backgroundColor: "#dcdcdc",
     fontWeight: "bold",
     borderLeft: 1,
     borderLeftColor: "#000",
   },
-  // Fila TOTAL
   totalRow: {
     flexDirection: "row",
     borderBottom: 1,
     borderBottomColor: "#000",
-    minHeight: 20,
+    minHeight: 15,
     alignItems: "center",
     backgroundColor: "#dcdcdc",
   },
   totalPrecioUnitCell: {
     width: 90,
-    textAlign: "right",
-    fontSize: 7,
-    padding: 4,
+    textAlign: "center", // Centrar el texto "TOTAL"
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
     fontWeight: "bold",
+    backgroundColor: "#dcdcdc", // Asegurar que el fondo cubra toda la celda
   },
   totalTotalCell: {
     width: 90,
-    textAlign: "center",
-    fontSize: 7,
-    padding: 4,
+    textAlign: "center", // Centrar el valor total
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
     fontWeight: "bold",
+    backgroundColor: "#dcdcdc", // Asegurar que el fondo cubra toda la celda
   },
-  // Otras celdas vacías para la fila TOTAL
   emptyCell: {
     width: 40,
-    fontSize: 7,
-    padding: 4,
+    fontSize: 6,
+    padding: 3,
     borderLeft: 1,
     borderLeftColor: "#000",
+    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
   },
   emptyCellWide: {
     width: 80,
-    fontSize: 7,
-    padding: 4,
-    borderLeft: 1,
+    fontSize: 6,
+    padding: 3,
+    borderLeft: 0,
     borderLeftColor: "#000",
+    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
   },
   emptyCellMedium: {
     width: 60,
-    fontSize: 7,
-    padding: 4,
-    borderLeft: 1,
+    fontSize: 6,
+    padding: 3,
+    borderLeft: 0,
     borderLeftColor: "#000",
+    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
   },
   emptyCellExtraWide: {
-    width: 220,
-    fontSize: 7,
-    padding: 4,
-    borderLeft: 1,
+    width: 260,
+    fontSize: 6,
+    padding: 3,
+    borderLeft: 0,
     borderLeftColor: "#000",
+    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
   },
   emptyCellLong: {
     width: 90,
-    fontSize: 7,
-    padding: 4,
-    borderLeft: 1,
+    fontSize: 6,
+    padding: 3,
+    borderLeft: 0,
     borderLeftColor: "#000",
+    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
   },
-  signaturesContainer: {
+  body: {
+    flex: 1,
+    flexDirection: "column",
+  },
+  footer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 40,
-    width: "100%",
+    borderTop: 1,
+    borderTopColor: "#000",
+    paddingTop: 10,
+    marginTop: 20,
   },
   signature: {
     flex: 1,
     alignItems: "center",
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
   signatureLine: {
-    width: 120,
-    borderBottom: 1,
-    borderBottomColor: "#000",
-    marginBottom: 5,
+    width: 100,
+    marginBottom: 3,
   },
   signatureText: {
-    fontSize: 8,
+    fontSize: 6,
     textAlign: "center",
   },
 });
@@ -324,28 +343,44 @@ const ModalOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: "center",
   z-index: 1000;
 `;
 
 const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
+  background-color: ${(props) => props.theme.bg};
+  padding: 15px;
+  border-radius: 8px;
+  width: 350px;
   max-width: 90%;
   text-align: center;
 `;
 
 const ModalButton = styled.button`
-  padding: 10px 20px;
-  margin: 10px;
+  padding: 8px 16px;
+  margin: 8px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   background-color: ${(props) => (props.primary ? "#007bff" : "#ccc")};
   color: white;
+`;
+
+// Contenedor para el PDF
+const PDFContainer = styled.div`
+  position: relative;
+  width: 842px;
+  height: 595px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  .pdfviewer {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 function KardexEntradaSalida() {
@@ -357,10 +392,10 @@ function KardexEntradaSalida() {
     setBuscador,
     addProductoItem,
     productoItemSelect,
+    removeProductoItem,
   } = useProductosStore();
   const { dataempresa } = useEmpresaStore();
 
-  // Estados del formulario
   const [dependencia, setDependencia] = useState("");
   const [solicitaEntrega, setSolicitaEntrega] = useState("");
   const [destino, setDestino] = useState("");
@@ -370,12 +405,12 @@ function KardexEntradaSalida() {
   const [subPrograma, setSubPrograma] = useState("");
   const [meta, setMeta] = useState("");
 
-  // Estados para el contador y el modal
   const [contador, setContador] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isPrintable, setIsPrintable] = useState(false);
+  const pdfViewerRef = useRef(null);
 
-  // Consulta para el kardex
   const { data: dataKardex = [] } = useQuery({
     queryKey: ["reporte kardex entrada salida", productoItemSelect.map(p => p.id)],
     queryFn: async () => {
@@ -392,14 +427,25 @@ function KardexEntradaSalida() {
     enabled: !!dataempresa && productoItemSelect.length > 0,
   });
 
-  // Consulta para el buscador de productos
   const { data: dataproductosbuscador } = useQuery({
     queryKey: ["buscar productos", { id_empresa: dataempresa?.id, descripcion: buscador }],
     queryFn: () => buscarProductos({ id_empresa: dataempresa?.id, descripcion: buscador }),
     enabled: !!dataempresa && !!buscador,
   });
 
-  // Calcular el total de la tabla
+  // Filtrar productos que tienen una última salida
+  const productosConUltimaSalida = dataKardex
+    .map((movimientos, index) => {
+      const ultimaSalida = movimientos
+        .filter((m) => m.tipo === "salida")
+        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+      return ultimaSalida ? { ...ultimaSalida, id: `${index}-${ultimaSalida.id}`, producto: productoItemSelect[index] } : null;
+    })
+    .filter(Boolean);
+
+  // Lista de productos seleccionados que tienen última salida (para mostrar en la UI y permitir eliminación)
+  const productosMostrados = productosConUltimaSalida.map(item => item.producto);
+
   const tableTotal = dataKardex.length > 0
     ? dataKardex
         .map((movimientos, index) => {
@@ -411,27 +457,25 @@ function KardexEntradaSalida() {
         .reduce((acc, curr) => acc + curr, 0)
     : 0;
 
-  // Resumen por código de cuenta
   const resumenCuentas = {};
   dataKardex.forEach(movimientos => {
-    const salidasUnicas = {};
-    movimientos.forEach(m => {
-      if (m.tipo === "salida") {
-        const cuenta = m.codigobarras || "SIN CUENTA";
-        if (!salidasUnicas[cuenta]) {
-          const cantidad = parseFloat(m.cantidad) || 0;
-          const precio = parseFloat(m.preciocompra) || 0;
-          salidasUnicas[cuenta] = cantidad * precio;
-        }
-      }
-    });
-    Object.entries(salidasUnicas).forEach(([cuenta, total]) => {
+    const ultimaSalida = movimientos
+      .filter((m) => m.tipo === "salida")
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
+
+    if (ultimaSalida) {
+      const cuenta = ultimaSalida.codigobarras || "SIN CUENTA";
+      const cantidad = parseFloat(ultimaSalida.cantidad) || 0;
+      const precio = parseFloat(ultimaSalida.preciocompra) || 0;
+      const total = cantidad * precio;
       resumenCuentas[cuenta] = (resumenCuentas[cuenta] || 0) + total;
-    });
+    }
   });
   const totalResumen = Object.values(resumenCuentas).reduce((acc, curr) => acc + curr, 0);
 
-  // Función para renderizar filas de la tabla
+  const cantidadProductos = productosConUltimaSalida.length;
+  const cantidadProductosTexto = numberToText(cantidadProductos);
+
   const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false) => {
     if (isHeader) {
       return (
@@ -491,7 +535,6 @@ function KardexEntradaSalida() {
     }
   };
 
-  // Función para incrementar el contador en Supabase
   const incrementarContador = async () => {
     try {
       const { data, error } = await supabase
@@ -520,22 +563,48 @@ function KardexEntradaSalida() {
     }
   };
 
-  // Función para manejar el clic en "Generar"
   const handleGenerateClick = () => {
     setShowModal(true);
   };
 
-  // Función para reiniciar la página
   const handleResetPage = () => {
     window.location.reload();
   };
 
-  // Fecha formateada
+  const handleRemoveProduct = (productId) => {
+    removeProductoItem(productId);
+  };
+
+  useEffect(() => {
+    if (showPDF) {
+      const checkIframe = setInterval(() => {
+        const pdfViewer = pdfViewerRef.current;
+        if (pdfViewer) {
+          const iframe = pdfViewer.querySelector("iframe");
+          if (iframe) {
+            setIsPrintable(true);
+            clearInterval(checkIframe);
+          }
+        }
+      }, 100); // Verifica cada 100ms
+
+      // Si después de 5 segundos no se encuentra el iframe, mostramos el botón de todos modos
+      const timeout = setTimeout(() => {
+        setIsPrintable(true);
+        clearInterval(checkIframe);
+      }, 5000);
+
+      return () => {
+        clearInterval(checkIframe);
+        clearTimeout(timeout);
+      };
+    }
+  }, [showPDF]);
+
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
-  // Validar si el botón debe estar habilitado
-  const isGenerateDisabled = !dependencia || productoItemSelect.length === 0;
+  const isGenerateDisabled = !dependencia || productosConUltimaSalida.length === 0;
 
   return (
     <Container>
@@ -557,11 +626,11 @@ function KardexEntradaSalida() {
         )}
       </BuscadorContainer>
 
-      <div style={{ display: "flex", gap: "30px", flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: "300px" }}>
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: "250px" }}>
           <FormInputGroup>
-            <label>Dependencia solicitante:</label>
-            <select value={dependencia} onChange={(e) => setDependencia(e.target.value)}>
+            <label style={{ fontSize: 12 }}>Dependencia solicitante:</label>
+            <select value={dependencia} onChange={(e) => setDependencia(e.target.value)} style={{ fontSize: 14, padding: "10px 12px" }}>
               <option value="">-- Seleccione --</option>
               <option>Área de Liquidaciones</option>
               <option>Cuna Jardín San Gerónimo</option>
@@ -586,11 +655,12 @@ function KardexEntradaSalida() {
             </select>
           </FormInputGroup>
           <FormInputGroup>
-            <label>Solicito Entregar a:</label>
+            <label style={{ fontSize: 12 }}>Solicito Entregar a:</label>
             <input
               type="text"
               value={solicitaEntrega}
               onChange={(e) => setSolicitaEntrega(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
           <SearchableSelect
@@ -599,79 +669,114 @@ function KardexEntradaSalida() {
             value={destino}
             onChange={setDestino}
             placeholder="Buscar destino..."
+            labelStyle={{ fontSize: 12 }}
+            inputStyle={{ fontSize: 14, padding: "10px 12px" }}
           />
           <FormInputGroup>
-            <label>Referencia:</label>
+            <label style={{ fontSize: 12 }}>Referencia:</label>
             <input
               type="text"
               value={referencia}
               onChange={(e) => setReferencia(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
         </div>
-        <div style={{ flex: 1, minWidth: "300px" }}>
+        <div style={{ flex: 1, minWidth: "250px" }}>
           <FormInputGroup>
-            <label>Cuenta Mayor:</label>
+            <label style={{ fontSize: 12 }}>Cuenta Mayor:</label>
             <input
               type="text"
               value={ctaMayor}
               onChange={(e) => setCtaMayor(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
           <FormInputGroup>
-            <label>Programa:</label>
+            <label style={{ fontSize: 12 }}>Programa:</label>
             <input
               type="text"
               value={programa}
               onChange={(e) => setPrograma(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
           <FormInputGroup>
-            <label>Sub-Programa:</label>
+            <label style={{ fontSize: 12 }}>Sub-Programa:</label>
             <input
               type="text"
               value={subPrograma}
               onChange={(e) => setSubPrograma(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
           <FormInputGroup>
-            <label>Meta:</label>
+            <label style={{ fontSize: 12 }}>Meta:</label>
             <input
               type="text"
               value={meta}
               onChange={(e) => setMeta(e.target.value)}
+              style={{ fontSize: 14, padding: "10px 12px" }}
             />
           </FormInputGroup>
         </div>
       </div>
 
-      {/* Botón Generar */}
-      <FormInputGroup>
-        <button
-          onClick={handleGenerateClick}
-          disabled={isGenerateDisabled}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: isGenerateDisabled ? "#ccc" : "#007bff",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: isGenerateDisabled ? "not-allowed" : "pointer",
-            fontSize: "16px",
-          }}
-        >
-          Generar
-        </button>
-      </FormInputGroup>
+      {/* Mostrar productos seleccionados con última salida y opción de eliminar */}
+      {productosMostrados.length > 0 && (
+        <div style={{ marginBottom: "20px" }}>
+          <h3 style={{ fontSize: 16 }}>Productos Seleccionados</h3>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {productosMostrados.map((product, index) => (
+              <li key={product.id} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                <span style={{ marginRight: "10px" }}>{product.descripcion || `Producto ${index + 1}`}</span>
+                <button
+                  onClick={() => handleRemoveProduct(product.id)}
+                  style={{
+                    padding: "5px 10px",
+                    backgroundColor: "#ff4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: 12,
+                  }}
+                >
+                  Eliminar
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      {/* Modal */}
+      <ButtonGroup>
+        <FormInputGroup>
+          <button
+            onClick={handleGenerateClick}
+            disabled={isGenerateDisabled}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: isGenerateDisabled ? "#ccc" : "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: isGenerateDisabled ? "not-allowed" : "pointer",
+              fontSize: 14,
+            }}
+          >
+            Generar
+          </button>
+        </FormInputGroup>
+      </ButtonGroup>
+
       {showModal && (
         <ModalOverlay>
           <ModalContent>
             {showPDF ? (
               <>
-                <h3>Reinicio Requerido</h3>
-                <p>Es necesario reiniciar la página para generar un nuevo documento.</p>
+                <h3 style={{ fontSize: 16 }}>Reinicio Requerido</h3>
+                <p style={{ fontSize: 12 }}>Es necesario reiniciar la página para generar un nuevo documento.</p>
                 <ModalButton primary onClick={handleResetPage}>
                   Reiniciar página
                 </ModalButton>
@@ -681,8 +786,8 @@ function KardexEntradaSalida() {
               </>
             ) : (
               <>
-                <h3>Confirmar Generación</h3>
-                <p>¿Está seguro de generar el documento?</p>
+                <h3 style={{ fontSize: 16 }}>Confirmar Generación</h3>
+                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento?</p>
                 <ModalButton primary onClick={incrementarContador}>
                   Aceptar
                 </ModalButton>
@@ -695,118 +800,127 @@ function KardexEntradaSalida() {
         </ModalOverlay>
       )}
 
-      {/* Mostrar PDF */}
       {showPDF && (
-        <PDFViewer className="pdfviewer">
-          <Document title="Reporte de stock todos">
-            <Page size="A4" orientation="landscape" style={styles.page}>
-              <Image
-                src="../src/assets/GORE.png"
-                style={styles.image}
-              />
-              <View style={{ flexDirection: "column", width: "100%" }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    fontSize: 6,
-                    marginBottom: 10,
-                  }}
-                >
-                  <View style={{ width: "48%" }}>
-                    <Text>UNIDAD EJECUTORA SUB REGION</Text>
-                    <Text>DE DESARROLLO ILO N°003</Text>
-                    <Text>ALMACEN CENTRAL</Text>
-                    <Text>AV. VENECIA N°222</Text>
-                    <Text>RUC: 20532480397</Text>
-                  </View>
-                  <View style={{ width: "10%" }}>
-                    <Text>Fecha: {formattedDate}</Text>
-                    <Text>Generado por: {dataKardex?.[0]?.[0]?.nombres || "Usuario X"}</Text>
-                    <Text>Número de Documento: {contador || "Cargando..."}</Text>
-                  </View>
-                </View>
-                <Text style={styles.titleText}>
-                  PEDIDO COMPROBANTE DE SALIDA
-                </Text>
-                <View style={{ fontSize: 8, textAlign: "center", marginBottom: 10 }}>
-                  <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    fontSize: 8,
-                    marginBottom: 10,
-                  }}
-                >
-                  <View style={{ width: "48%" }}>
-                    <Text style={styles.boldText}>
-                      Dependencia Solicitante: {dependencia || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Solicito Entregar a: {solicitaEntrega || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Con Destino a: {destino || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Referencia: {referencia || "No especificado"}
-                    </Text>
-                  </View>
-                  <View style={{ width: "30%" }}>
-                    <Text style={styles.boldText}>
-                      Cuenta Mayor: {ctaMayor || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Programa: {programa || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Sub-Programa: {subPrograma || "No especificado"}
-                    </Text>
-                    <Text style={styles.boldText}>
-                      Meta: {meta || "No especificado"}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.table}>
-                  {renderTableRow({}, true)}
-                  {dataKardex.length > 0 &&
-                    dataKardex
-                      .map((movimientos, index) => {
-                        const ultimaSalida = movimientos
-                          .filter((m) => m.tipo === "salida")
-                          .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))[0];
-                        return ultimaSalida ? { ...ultimaSalida, id: `${index}-${ultimaSalida.id}` } : null;
-                      })
-                      .filter(Boolean)
-                      .map((ultimaSalida, i) => renderTableRow(ultimaSalida, false, i))}
-                  {dataKardex.length > 0 && renderTableRow({}, false, null, true)}
-                </View>
-                <View style={{ marginTop: 30 }}>
-                  <Text style={{ fontSize: 10, fontWeight: "bold", marginBottom: 5 }}>
-                    Resumen por Código de Cuenta
-                  </Text>
-                  <View style={[styles.row, { backgroundColor: "#f0f0f0" }]}>
-                    <Text style={[styles.cell, { fontWeight: "bold", width: 200 }]}>Código Cuenta</Text>
-                    <Text style={[styles.cell, { fontWeight: "bold", width: 200 }]}>Total Precio (S/.)</Text>
-                  </View>
-                  {Object.entries(resumenCuentas).map(([codigo, total]) => (
-                    <View key={codigo} style={styles.row}>
-                      <Text style={[styles.cell, { width: 200 }]}>{codigo}</Text>
-                      <Text style={[styles.cell, { width: 200 }]}>
-                        S/. {total.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        <PDFContainer>
+          <PDFViewer ref={pdfViewerRef} className="pdfviewer">
+            <Document title="Reporte de stock todos">
+              <Page size="A4" orientation="landscape" style={styles.page}>
+                <Image src="../src/assets/GORE.png" style={styles.image} />
+                <View style={styles.body}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      fontSize: 6,
+                      marginBottom: 5,
+                    }}
+                  >
+                    <View style={{ width: "30%" }}>
+                      <Text>UNIDAD EJECUTORA SUB REGION</Text>
+                      <Text>DE DESARROLLO ILO N°003</Text>
+                      <Text>ALMACEN CENTRAL</Text>
+                      <Text>AV. VENECIA N°222</Text>
+                      <Text>RUC: 20532480397</Text>
+                    </View>
+                    <View style={{ width: "40%", textAlign: "center" }}>
+                      <Text style={styles.titleText}>PEDIDO COMPROBANTE DE SALIDA</Text>
+                      <View style={{ fontSize: 6, textAlign: "center", marginBottom: 5 }}>
+                        <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
+                      </View>
+                    </View>
+                    <View style={{ width: "20%", textAlign: "right" }}>
+                      <Text>Fecha: {formattedDate}</Text>
+                      <Text>Generado por: {dataKardex?.[0]?.[0]?.nombres || "Usuario X"}</Text>
+                      <Text>Número de Documento:</Text>
+                      <Text style={{ fontWeight: "bold", fontSize: 12 }}>
+                        {contador || "Cargando..."}
                       </Text>
                     </View>
-                  ))}
-                  <View style={[styles.row, { marginTop: 10, backgroundColor: "#dcdcdc" }]}>
-                    <Text style={[styles.cell, { fontWeight: "bold", width: 200 }]}>TOTAL GENERAL</Text>
-                    <Text style={[styles.cell, { fontWeight: "bold", width: 200 }]}>
-                      S/. {totalResumen.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      fontSize: 6,
+                      marginBottom: 15,
+                    }}
+                  >
+                    <View style={{ width: "48%" }}>
+                      <Text style={styles.boldText}>
+                        Dependencia Solicitante: {dependencia || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Solicito Entregar a: {solicitaEntrega || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Con Destino a: {destino || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Referencia: {referencia || "No especificado"}
+                      </Text>
+                    </View>
+                    <View style={{ width: "30%" }}>
+                      <Text style={styles.boldText}>
+                        Cuenta Mayor: {ctaMayor || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Programa: {programa || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Sub-Programa: {subPrograma || "No especificado"}
+                      </Text>
+                      <Text style={styles.boldText}>
+                        Meta: {meta || "No especificado"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.table}>
+                    {renderTableRow({}, true)}
+                    {productosConUltimaSalida.length > 0 &&
+                      productosConUltimaSalida.map((ultimaSalida, i) => renderTableRow(ultimaSalida, false, i))}
+                    {productosConUltimaSalida.length > 0 && renderTableRow({}, false, null, true)}
+                  </View>
+                  <View style={{ marginTop: 15, flexDirection: "row", justifyContent: "space-between", width: "40%" }}>
+                    <View style={{ width: "60%" }}>
+                      <Text style={{ fontSize: 8, fontWeight: "bold", marginBottom: 3 }}>
+                        Resumen por Código de Cuenta
+                      </Text>
+                      <View style={[styles.row, { backgroundColor: "#f0f0f0" }]}>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 160 }]}>Código Cuenta</Text>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 105 }]}>Total Precio (S/.)</Text>
+                      </View>
+                      {Object.entries(resumenCuentas).map(([codigo, total]) => (
+                        <View key={codigo} style={styles.row}>
+                          <Text style={[styles.cell, { width: 120 }]}>{codigo}</Text>
+                          <Text style={[styles.cell, { width: 80 }]}>
+                            S/. {total.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                        </View>
+                      ))}
+                      <View style={[styles.row, { marginTop: 5, backgroundColor: "#dcdcdc" }]}>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 120 }]}>TOTAL GENERAL</Text>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 80 }]}>
+                          S/. {totalResumen.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{ width: "20%", paddingLeft: 5 }}>
+                      <Text style={{ fontSize: 8, marginBottom: 3 }}>
+                        Cantidad de Productos seleccionados:
+                      </Text>
+                      <View style={{ fontSize: 8, marginBottom: 3 }}>
+                        <Text> {cantidadProductos} ({cantidadProductosTexto})</Text>
+                      </View>
+                    </View>
+                    <View style={{ width: "20%", paddingLeft: 5 }}>
+                      <Text style={{ fontSize: 8 }}>
+                        Fecha de Recepción: _______________
+                      </Text>
+                    </View>
                   </View>
                 </View>
-                <View style={styles.signaturesContainer}>
+                <View style={styles.footer} fixed>
                   <View style={styles.signature}>
                     <View style={styles.signatureLine} />
                     <Text style={styles.signatureText}>Jefe de Abastecimiento</Text>
@@ -824,26 +938,27 @@ function KardexEntradaSalida() {
                     <Text style={styles.signatureText}>Recibí Conforme</Text>
                   </View>
                 </View>
-              </View>
-            </Page>
-          </Document>
-        </PDFViewer>
+              </Page>
+            </Document>
+          </PDFViewer>
+        </PDFContainer>
       )}
     </Container>
   );
 }
 
-// Estilos con styled-components
 const Container = styled.div`
   width: 100%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  .pdfviewer {
-    width: 100%;
-    height: 100%;
-  }
+  gap: 10px;
+  padding: 20px;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 `;
 
 const BuscadorContainer = styled.div`
@@ -857,7 +972,7 @@ const BuscadorContainer = styled.div`
     z-index: 10;
     background: ${(props) => props.theme.bg};
     border: 1px solid #ccc;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
   }
 `;
@@ -865,10 +980,10 @@ const BuscadorContainer = styled.div`
 const FormInputGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
   label {
-    font-size: 14px;
+    font-size: 12;
     color: ${(props) => props.theme.text};
   }
   input,
@@ -877,9 +992,9 @@ const FormInputGroup = styled.div`
     background-color: ${(props) => props.theme.bg};
     color: ${(props) => props.theme.text};
     border: 1px solid #414244;
-    border-radius: 10px;
-    padding: 12px 15px;
-    font-size: 16px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    fontSize: 14;
     outline: none;
     width: 100%;
   }
