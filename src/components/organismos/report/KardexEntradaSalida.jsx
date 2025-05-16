@@ -4,7 +4,6 @@ import {
   Page,
   Text,
   View,
-  StyleSheet,
   PDFViewer,
   Image,
 } from "@react-pdf/renderer";
@@ -19,6 +18,7 @@ import { useState, useEffect, useRef } from "react";
 import { destinos } from "../../../store/destinos";
 import SearchableSelect from "./SearchableSelect";
 import { supabase } from "../../../index";
+import { styles } from "../../../styles/pdfStyles";
 
 // Función para convertir números a texto
 const numberToText = (num) => {
@@ -38,300 +38,8 @@ const numberToText = (num) => {
     if (unidad === 0) return decenas[decena];
     return `${decenas[decena]} Y ${unidades[unidad]}`;
   }
-  return num.toString(); // Para números >= 100, devolvemos el número como string
+  return num.toString();
 };
-
-// Estilos del PDF
-const styles = StyleSheet.create({
-  page: { 
-    flexDirection: "column",
-    padding: 20,
-    backgroundColor: "transparent",
-  },
-  image: {
-    width: 60,
-    height: 40,
-    marginBottom: 5,
-    position: "relative",
-    zIndex: 1,
-  },
-  boldText: {
-    fontWeight: "bold",
-    marginLeft: 10,
-    fontSize: 6,
-  },
-  titleText: {
-    fontWeight: "bold",
-    fontSize: 12,
-    textAlign: "center",
-  },
-  table: { 
-    width: "100%", 
-    marginTop: 5,
-    borderTop: 1,
-    borderTopColor: "#000",
-    borderRight: 1,
-    borderRightColor: "#000",
-  },
-  row: {
-    flexDirection: "row",
-    borderBottom: 1,
-    borderBottomColor: "#000",
-    minHeight: 15,
-    alignItems: "center",
-  },
-  cell: {
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  headerCell: {
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  itemCell: {
-    width: 40,
-    textAlign: "left",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  itemHeaderCell: {
-    width: 40,
-    textAlign: "left",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  codigoCell: {
-    width: 80,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  codigoHeaderCell: {
-    width: 80,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cantidadCell: {
-    width: 60,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cantidadHeaderCell: {
-    width: 60,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  descripcionCell: {
-    width: 260,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  descripcionHeaderCell: {
-    width: 260,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cuentaCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cuentaHeaderCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cantDespCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  cantDespHeaderCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  precioUnitCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  precioUnitHeaderCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  totalCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  totalHeaderCell: {
-    width: 90,
-    textAlign: "center",
-    fontSize: 6,
-    padding: 3,
-    backgroundColor: "#dcdcdc",
-    fontWeight: "bold",
-    borderLeft: 1,
-    borderLeftColor: "#000",
-  },
-  totalRow: {
-    flexDirection: "row",
-    borderBottom: 1,
-    borderBottomColor: "#000",
-    minHeight: 15,
-    alignItems: "center",
-    backgroundColor: "#dcdcdc",
-  },
-  totalPrecioUnitCell: {
-    width: 90,
-    textAlign: "center", // Centrar el texto "TOTAL"
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-    fontWeight: "bold",
-    backgroundColor: "#dcdcdc", // Asegurar que el fondo cubra toda la celda
-  },
-  totalTotalCell: {
-    width: 90,
-    textAlign: "center", // Centrar el valor total
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-    fontWeight: "bold",
-    backgroundColor: "#dcdcdc", // Asegurar que el fondo cubra toda la celda
-  },
-  emptyCell: {
-    width: 40,
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 1,
-    borderLeftColor: "#000",
-    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
-  },
-  emptyCellWide: {
-    width: 80,
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 0,
-    borderLeftColor: "#000",
-    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
-  },
-  emptyCellMedium: {
-    width: 60,
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 0,
-    borderLeftColor: "#000",
-    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
-  },
-  emptyCellExtraWide: {
-    width: 260,
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 0,
-    borderLeftColor: "#000",
-    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
-  },
-  emptyCellLong: {
-    width: 90,
-    fontSize: 6,
-    padding: 3,
-    borderLeft: 0,
-    borderLeftColor: "#000",
-    backgroundColor: "#dcdcdc", // Asegurar que las celdas vacías también tengan el fondo
-  },
-  body: {
-    flex: 1,
-    flexDirection: "column",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderTop: 1,
-    borderTopColor: "#000",
-    paddingTop: 10,
-    marginTop: 20,
-  },
-  signature: {
-    flex: 1,
-    alignItems: "center",
-    marginHorizontal: 5,
-  },
-  signatureLine: {
-    width: 100,
-    marginBottom: 3,
-  },
-  signatureText: {
-    fontSize: 6,
-    textAlign: "center",
-  },
-});
 
 // Estilos para el modal
 const ModalOverlay = styled.div`
@@ -343,7 +51,7 @@ const ModalOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: "center",
+  align-items: center;
   z-index: 1000;
 `;
 
@@ -367,7 +75,6 @@ const ModalButton = styled.button`
   color: white;
 `;
 
-// Contenedor para el PDF
 const PDFContainer = styled.div`
   position: relative;
   width: 842px;
@@ -408,11 +115,16 @@ function KardexEntradaSalida() {
   const [contador, setContador] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isPrintable, setIsPrintable] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedDocumentoId, setSavedDocumentoId] = useState(null);
   const pdfViewerRef = useRef(null);
 
   const { data: dataKardex = [] } = useQuery({
-    queryKey: ["reporte kardex entrada salida", productoItemSelect.map(p => p.id)],
+    queryKey: ["reporte kardex salida", productoItemSelect.map(p => p.id)],
     queryFn: async () => {
       const responses = await Promise.all(
         productoItemSelect.map(p =>
@@ -433,7 +145,6 @@ function KardexEntradaSalida() {
     enabled: !!dataempresa && !!buscador,
   });
 
-  // Filtrar productos que tienen una última salida
   const productosConUltimaSalida = dataKardex
     .map((movimientos, index) => {
       const ultimaSalida = movimientos
@@ -443,7 +154,6 @@ function KardexEntradaSalida() {
     })
     .filter(Boolean);
 
-  // Lista de productos seleccionados que tienen última salida (para mostrar en la UI y permitir eliminación)
   const productosMostrados = productosConUltimaSalida.map(item => item.producto);
 
   const tableTotal = dataKardex.length > 0
@@ -535,32 +245,127 @@ function KardexEntradaSalida() {
     }
   };
 
-  const incrementarContador = async () => {
+  const generatePDF = async () => {
     try {
       const { data, error } = await supabase
         .from("contador_documentos")
-        .select("contador")
+        .select("contador_pecosa")
         .eq("id", 1)
         .single();
 
       if (error) throw error;
 
-      const nuevoContador = data.contador + 1;
+      const nuevoContador = data.contador_pecosa + 1;
+      const formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
 
       const { error: updateError } = await supabase
         .from("contador_documentos")
-        .update({ contador: nuevoContador, updated_at: new Date().toISOString() })
+        .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
         .eq("id", 1);
 
       if (updateError) throw updateError;
 
-      setContador(nuevoContador);
+      setContador(formattedContador);
       setShowPDF(true);
       setShowModal(false);
     } catch (error) {
-      console.error("Error al actualizar el contador:", error);
-      alert("No se pudo generar el documento. Intenta de nuevo.");
+      console.error("Error al generar el PDF:", error);
+      alert(`No se pudo generar el PDF: ${error.message || "Error desconocido"}`);
     }
+  };
+
+  const saveToDatabase = async () => {
+    try {
+      setIsSaving(true);
+      let formattedContador = contador;
+
+      if (!formattedContador) {
+        const { data, error } = await supabase
+          .from("contador_documentos")
+          .select("contador_pecosa")
+          .eq("id", 1)
+          .single();
+
+        if (error) throw error;
+
+        const nuevoContador = data.contador_pecosa + 1;
+        formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
+
+        const { error: updateError } = await supabase
+          .from("contador_documentos")
+          .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
+          .eq("id", 1);
+
+        if (updateError) throw updateError;
+
+        setContador(formattedContador);
+      }
+
+      // Verificar si el numero_documento ya existe
+      const { data: existing } = await supabase
+        .from("registro_pecosa")
+        .select("id")
+        .eq("numero_documento", formattedContador)
+        .single();
+
+      if (existing) {
+        throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
+      }
+
+      if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
+        throw new Error("Invalid id_empresa: must be a valid integer");
+      }
+
+      const formData = {
+        numero_documento: formattedContador,
+        dependencia_solicitante: dependencia || "No especificado",
+        solicita_entrega: solicitaEntrega || null,
+        destino: destino || null,
+        referencia: referencia || null,
+        cuenta_mayor: ctaMayor || null,
+        programa: programa || null,
+        sub_programa: subPrograma || null,
+        meta: meta || null,
+        productos: productoItemSelect,
+        total_monto: tableTotal,
+        id_empresa: parseInt(dataempresa.id),
+        generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
+      };
+
+      console.log("Inserting into registro_pecosa:", formData);
+
+      const { error: insertError } = await supabase
+        .from("registro_pecosa")
+        .insert([formData]);
+
+      if (insertError) throw insertError;
+
+      setIsSaved(true);
+      setSavedDocumentoId(formattedContador);
+      setShowSuccessMessage(true);
+    } catch (error) {
+      console.error("Error al guardar los datos:", error);
+      alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowConfirmModal(false);
+    await saveToDatabase();
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmModal(false);
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccessMessage(false);
   };
 
   const handleGenerateClick = () => {
@@ -586,9 +391,8 @@ function KardexEntradaSalida() {
             clearInterval(checkIframe);
           }
         }
-      }, 100); // Verifica cada 100ms
+      }, 100);
 
-      // Si después de 5 segundos no se encuentra el iframe, mostramos el botón de todos modos
       const timeout = setTimeout(() => {
         setIsPrintable(true);
         clearInterval(checkIframe);
@@ -625,7 +429,7 @@ function KardexEntradaSalida() {
           />
         )}
       </BuscadorContainer>
-
+      <h2>GENERAR REPORTE PECOSA</h2>
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: "250px" }}>
           <FormInputGroup>
@@ -722,7 +526,6 @@ function KardexEntradaSalida() {
         </div>
       </div>
 
-      {/* Mostrar productos seleccionados con última salida y opción de eliminar */}
       {productosMostrados.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
           <h3 style={{ fontSize: 16 }}>Productos Seleccionados</h3>
@@ -768,6 +571,23 @@ function KardexEntradaSalida() {
             Generar
           </button>
         </FormInputGroup>
+        <FormInputGroup>
+          <button
+            onClick={handleSaveClick}
+            disabled={isGenerateDisabled || isSaving || isSaved}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: (isGenerateDisabled || isSaving || isSaved) ? "#ccc" : "#28a745",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: (isGenerateDisabled || isSaving || isSaved) ? "not-allowed" : "pointer",
+              fontSize: 14,
+            }}
+          >
+            {isSaving ? "Guardando..." : "Guardar"}
+          </button>
+        </FormInputGroup>
       </ButtonGroup>
 
       {showModal && (
@@ -787,8 +607,8 @@ function KardexEntradaSalida() {
             ) : (
               <>
                 <h3 style={{ fontSize: 16 }}>Confirmar Generación</h3>
-                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento?</p>
-                <ModalButton primary onClick={incrementarContador}>
+                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento PDF?</p>
+                <ModalButton primary onClick={generatePDF}>
                   Aceptar
                 </ModalButton>
                 <ModalButton onClick={() => setShowModal(false)}>
@@ -800,10 +620,39 @@ function KardexEntradaSalida() {
         </ModalOverlay>
       )}
 
+      {showConfirmModal && (
+        <ModalOverlay>
+          <ModalContent>
+            <h3 style={{ fontSize: 16 }}>Confirmar Guardado</h3>
+            <p style={{ fontSize: 12 }}>¿Está seguro de guardar la información en la base de datos?</p>
+            <ModalButton primary onClick={handleConfirmSave}>
+              Sí
+            </ModalButton>
+            <ModalButton onClick={handleCancelConfirm}>
+              Cancelar
+            </ModalButton>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+
+      {showSuccessMessage && (
+        <ModalOverlay>
+          <ModalContent>
+            <h3 style={{ fontSize: 16 }}>Guardado Exitoso</h3>
+            <p style={{ fontSize: 12 }}>
+              Se guardó el documento con ID: {savedDocumentoId} exitosamente.
+            </p>
+            <ModalButton primary onClick={handleCloseSuccess}>
+              OK
+            </ModalButton>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+
       {showPDF && (
         <PDFContainer>
           <PDFViewer ref={pdfViewerRef} className="pdfviewer">
-            <Document title="Reporte de stock todos">
+            <Document title="Reporte PECOSA">
               <Page size="A4" orientation="landscape" style={styles.page}>
                 <Image src="../src/assets/GORE.png" style={styles.image} />
                 <View style={styles.body}>
@@ -824,7 +673,7 @@ function KardexEntradaSalida() {
                       <Text>RUC: 20532480397</Text>
                     </View>
                     <View style={{ width: "40%", textAlign: "center" }}>
-                      <Text style={styles.titleText}>PEDIDO COMPROBANTE DE SALIDA</Text>
+                      <Text style={styles.titleText}>COMPROBANTE DE SALIDA PECOSA</Text>
                       <View style={{ fontSize: 6, textAlign: "center", marginBottom: 5 }}>
                         <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
                       </View>
@@ -983,7 +832,7 @@ const FormInputGroup = styled.div`
   gap: 6px;
   margin-bottom: 12px;
   label {
-    font-size: 12;
+    fontSize: 12px;
     color: ${(props) => props.theme.text};
   }
   input,
@@ -994,7 +843,7 @@ const FormInputGroup = styled.div`
     border: 1px solid #414244;
     border-radius: 8px;
     padding: 10px 12px;
-    fontSize: 14;
+    font-size: 14px;
     outline: none;
     width: 100%;
   }

@@ -36,7 +36,7 @@ const TableRow = styled.tr`
     background-color: ${(props) => props.theme.bg};
   }
   &:nth-child(odd) {
-    background-color: ${(props) => props.theme.bg};
+    background-color:  ${(props) => props.theme.bg};
   }
 `;
 
@@ -107,7 +107,7 @@ const ProductTable = styled.table`
 
 const ProductTableHeader = styled.th`
   padding: 8px;
-  background-color:${(props) => props.theme.bg};
+  background-color: #f0f0f0;
   font-size: 12px;
   text-align: left;
   border-bottom: 1px solid #414244;
@@ -119,16 +119,16 @@ const ProductTableCell = styled.td`
   border-bottom: 1px solid #414244;
 `;
 
-function ReportePecosaList() {
+function ReporteNeaList() {
   const [selectedReporte, setSelectedReporte] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Consulta para obtener todos los reportes de registro_pecosa
+  // Consulta para obtener todos los reportes de registro_nea
   const { data: reportes = [], isLoading, error } = useQuery({
-    queryKey: ["reportes_pecosa"],
+    queryKey: ["reportes_nea"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("registro_pecosa")
+        .from("registro_nea")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -156,7 +156,7 @@ function ReportePecosaList() {
 
   return (
     <Container>
-      <h2>Lista de Reportes PECOSA</h2>
+      <h2>Lista de Reportes NEA</h2>
       {reportes.length === 0 ? (
         <p>No hay reportes registrados.</p>
       ) : (
@@ -209,7 +209,7 @@ function ReportePecosaList() {
       {showModal && selectedReporte && (
         <ModalOverlay>
           <ModalContent>
-            <DetailTitle>Detalles del Reporte PECOSA</DetailTitle>
+            <DetailTitle>Detalles del Reporte NEA</DetailTitle>
             <DetailItem>
               <strong>Número de Documento:</strong> {selectedReporte.numero_documento}
             </DetailItem>
@@ -308,4 +308,4 @@ function ReportePecosaList() {
   );
 }
 
-export default ReportePecosaList;
+export default ReporteNeaList;

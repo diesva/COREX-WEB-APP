@@ -8,26 +8,27 @@ export function ReportesTemplate() {
           <Outlet/>
         </Content>
         <Sidebar>
-          <SidebarSection>
+          {/*<SidebarSection>
             <SidebarTitle>Stock Actual</SidebarTitle>
             <SidebarItem to="stock-actual-por-producto">
               Por producto
             </SidebarItem>
             <SidebarItem to="stock-actual-todos">Todos</SidebarItem>
             
-          </SidebarSection>
+          </SidebarSection>*/}
           <SidebarSection>
-          <SidebarTitle>Entradas y salidas</SidebarTitle>
-          <SidebarItem to="kardex-entradas-salidas">Por producto</SidebarItem>
-          <SidebarItem to="kardex-salidas">Salida por producto</SidebarItem>
-          <SidebarItem to="kardex-entradas">Entrada por producto</SidebarItem>
+          <SidebarTitle>Reporte Kardex</SidebarTitle>
+          <SidebarItem to="kardex-entradas-salidas">Reporte Pecosa</SidebarItem>
+          
+          <SidebarItem to="kardex-entradas">Reporte Neas</SidebarItem>
           </SidebarSection>
 
 
 
           <SidebarSection>
-          <SidebarTitle to="ss">Valorizado</SidebarTitle>
-          <SidebarItem to="inventario-valorado">Todos</SidebarItem>
+          <SidebarTitle to="ss">Historial de Reportes</SidebarTitle>
+          <SidebarItem to="historial-pecosas">Pecosas</SidebarItem>
+          <SidebarItem to="historial-neas">Neas</SidebarItem>
           </SidebarSection>
         </Sidebar>
       </PageContainer>

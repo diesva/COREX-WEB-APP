@@ -19,6 +19,7 @@ import { destinos } from "../../../store/destinos";
 import SearchableSelect from "./SearchableSelect";
 import { supabase } from "../../../index";
 import { styles } from "../../../styles/pdfStyles";
+
 // Función para convertir números a texto
 const numberToText = (num) => {
   const unidades = [
@@ -114,7 +115,12 @@ function KardexEntrada() {
   const [contador, setContador] = useState(null);
   const [showPDF, setShowPDF] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isPrintable, setIsPrintable] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedDocumentoId, setSavedDocumentoId] = useState(null);
   const pdfViewerRef = useRef(null);
 
   const { data: dataKardex = [] } = useQuery({
@@ -239,32 +245,127 @@ function KardexEntrada() {
     }
   };
 
-  const incrementarContador = async () => {
+  const generatePDF = async () => {
     try {
       const { data, error } = await supabase
         .from("contador_documentos")
-        .select("contador")
+        .select("contador_nea")
         .eq("id", 1)
         .single();
 
       if (error) throw error;
 
-      const nuevoContador = data.contador + 1;
+      const nuevoContador = data.contador_nea + 1;
+      const formattedContador = `COREX NEA - ${nuevoContador.toString().padStart(4, "0")}`;
 
       const { error: updateError } = await supabase
         .from("contador_documentos")
-        .update({ contador: nuevoContador, updated_at: new Date().toISOString() })
+        .update({ contador_nea: nuevoContador, updated_at: new Date().toISOString() })
         .eq("id", 1);
 
       if (updateError) throw updateError;
 
-      setContador(nuevoContador);
+      setContador(formattedContador);
       setShowPDF(true);
       setShowModal(false);
     } catch (error) {
-      console.error("Error al actualizar el contador:", error);
-      alert("No se pudo generar el documento. Intenta de nuevo.");
+      console.error("Error al generar el PDF:", error);
+      alert(`No se pudo generar el PDF: ${error.message || "Error desconocido"}`);
     }
+  };
+
+  const saveToDatabase = async () => {
+    try {
+      setIsSaving(true);
+      let formattedContador = contador;
+
+      if (!formattedContador) {
+        const { data, error } = await supabase
+          .from("contador_documentos")
+          .select("contador_nea")
+          .eq("id", 1)
+          .single();
+
+        if (error) throw error;
+
+        const nuevoContador = data.contador_nea + 1;
+        formattedContador = `COREX NEA - ${nuevoContador.toString().padStart(4, "0")}`;
+
+        const { error: updateError } = await supabase
+          .from("contador_documentos")
+          .update({ contador_nea: nuevoContador, updated_at: new Date().toISOString() })
+          .eq("id", 1);
+
+        if (updateError) throw updateError;
+
+        setContador(formattedContador);
+      }
+
+      // Verificar si el numero_documento ya existe
+      const { data: existing } = await supabase
+        .from("registro_nea")
+        .select("id")
+        .eq("numero_documento", formattedContador)
+        .single();
+
+      if (existing) {
+        throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
+      }
+
+      if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
+        throw new Error("Invalid id_empresa: must be a valid integer");
+      }
+
+      const formData = {
+        numero_documento: formattedContador,
+        dependencia_solicitante: dependencia || "No especificado",
+        solicita_entrega: solicitaEntrega || null,
+        destino: destino || null,
+        referencia: referencia || null,
+        cuenta_mayor: ctaMayor || null,
+        programa: programa || null,
+        sub_programa: subPrograma || null,
+        meta: meta || null,
+        productos: productoItemSelect,
+        total_monto: tableTotal,
+        id_empresa: parseInt(dataempresa.id),
+        generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
+      };
+
+      console.log("Inserting into registro_nea:", formData);
+
+      const { error: insertError } = await supabase
+        .from("registro_nea")
+        .insert([formData]);
+
+      if (insertError) throw insertError;
+
+      setIsSaved(true);
+      setSavedDocumentoId(formattedContador);
+      setShowSuccessMessage(true);
+    } catch (error) {
+      console.error("Error al guardar los datos:", error);
+      alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowConfirmModal(false);
+    await saveToDatabase();
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmModal(false);
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccessMessage(false);
   };
 
   const handleGenerateClick = () => {
@@ -328,7 +429,7 @@ function KardexEntrada() {
           />
         )}
       </BuscadorContainer>
-
+      <h2>GENERAR REPORTE NEA</h2>
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: "250px" }}>
           <FormInputGroup>
@@ -390,7 +491,7 @@ function KardexEntrada() {
             <label style={{ fontSize: 12 }}>Cuenta Mayor:</label>
             <input
               type="text"
-              value={ctaMayor} // Corregido de <%- ctxMayor %>
+              value={ctaMayor}
               onChange={(e) => setCtaMayor(e.target.value)}
               style={{ fontSize: 14, padding: "10px 12px" }}
             />
@@ -470,6 +571,23 @@ function KardexEntrada() {
             Generar
           </button>
         </FormInputGroup>
+        <FormInputGroup>
+          <button
+            onClick={handleSaveClick}
+            disabled={isGenerateDisabled || isSaving || isSaved}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: (isGenerateDisabled || isSaving || isSaved) ? "#ccc" : "#28a745",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: (isGenerateDisabled || isSaving || isSaved) ? "not-allowed" : "pointer",
+              fontSize: 14,
+            }}
+          >
+            {isSaving ? "Guardando..." : "Guardar"}
+          </button>
+        </FormInputGroup>
       </ButtonGroup>
 
       {showModal && (
@@ -489,8 +607,8 @@ function KardexEntrada() {
             ) : (
               <>
                 <h3 style={{ fontSize: 16 }}>Confirmar Generación</h3>
-                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento?</p>
-                <ModalButton primary onClick={incrementarContador}>
+                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento PDF?</p>
+                <ModalButton primary onClick={generatePDF}>
                   Aceptar
                 </ModalButton>
                 <ModalButton onClick={() => setShowModal(false)}>
@@ -502,10 +620,39 @@ function KardexEntrada() {
         </ModalOverlay>
       )}
 
+      {showConfirmModal && (
+        <ModalOverlay>
+          <ModalContent>
+            <h3 style={{ fontSize: 16 }}>Confirmar Guardado</h3>
+            <p style={{ fontSize: 12 }}>¿Está seguro de guardar la información en la base de datos?</p>
+            <ModalButton primary onClick={handleConfirmSave}>
+              Sí
+            </ModalButton>
+            <ModalButton onClick={handleCancelConfirm}>
+              Cancelar
+            </ModalButton>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+
+      {showSuccessMessage && (
+        <ModalOverlay>
+          <ModalContent>
+            <h3 style={{ fontSize: 16 }}>Guardado Exitoso</h3>
+            <p style={{ fontSize: 12 }}>
+              Se guardó el documento con ID: {savedDocumentoId} exitosamente.
+            </p>
+            <ModalButton primary onClick={handleCloseSuccess}>
+              OK
+            </ModalButton>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+
       {showPDF && (
         <PDFContainer>
           <PDFViewer ref={pdfViewerRef} className="pdfviewer">
-            <Document title="Reporte de entrada">
+            <Document title="Reporte NEA">
               <Page size="A4" orientation="landscape" style={styles.page}>
                 <Image src="../src/assets/GORE.png" style={styles.image} />
                 <View style={styles.body}>
@@ -526,7 +673,7 @@ function KardexEntrada() {
                       <Text>RUC: 20532480397</Text>
                     </View>
                     <View style={{ width: "40%", textAlign: "center" }}>
-                      <Text style={styles.titleText}>COMPROBANTE DE ENTRADA</Text>
+                      <Text style={styles.titleText}>COMPROBANTE DE ENTRADA NEA</Text>
                       <View style={{ fontSize: 6, textAlign: "center", marginBottom: 5 }}>
                         <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
                       </View>
@@ -685,7 +832,7 @@ const FormInputGroup = styled.div`
   gap: 6px;
   margin-bottom: 12px;
   label {
-    font-size: 12px;
+    fontSize: 12px;
     color: ${(props) => props.theme.text};
   }
   input,

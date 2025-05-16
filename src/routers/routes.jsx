@@ -16,6 +16,7 @@ import {
   StockBajoMinimo,
   KardexEntradaSalida,
   StockInventarioValorado,
+  HistorialNeas,
   KardexSalida,
   KardexEntrada,
   
@@ -145,10 +146,15 @@ export function MyRoutes() {
           element={<KardexEntrada />}
         />
         <Route
-          path="inventario-valorado"
+          path="historial-pecosas"
           element={<StockInventarioValorado />}
         />
+        <Route
+          path="historial-neas"
+          element={<HistorialNeas />}
+        />  
       </Route>
+      
     </Routes>
   );
 }
