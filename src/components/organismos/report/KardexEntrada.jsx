@@ -255,15 +255,8 @@ function KardexEntrada() {
 
       if (error) throw error;
 
-      const nuevoContador = data.contador_nea + 1;
-      const formattedContador = `COREX NEA - ${nuevoContador.toString().padStart(4, "0")}`;
-
-      const { error: updateError } = await supabase
-        .from("contador_documentos")
-        .update({ contador_nea: nuevoContador, updated_at: new Date().toISOString() })
-        .eq("id", 1);
-
-      if (updateError) throw updateError;
+      const nextContador = data.contador_nea + 1;
+      const formattedContador = `COREX NEA - ${nextContador.toString().padStart(4, "0")}`;
 
       setContador(formattedContador);
       setShowPDF(true);
@@ -299,9 +292,16 @@ function KardexEntrada() {
         if (updateError) throw updateError;
 
         setContador(formattedContador);
+      } else {
+        const nuevoContador = parseInt(formattedContador.split("-")[1].trim());
+        const { error: updateError } = await supabase
+          .from("contador_documentos")
+          .update({ contador_nea: nuevoContador, updated_at: new Date().toISOString() })
+          .eq("id", 1);
+
+        if (updateError) throw updateError;
       }
 
-      // Verificar si el numero_documento ya existe
       const { data: existing } = await supabase
         .from("registro_nea")
         .select("id")
@@ -654,6 +654,23 @@ function KardexEntrada() {
           <PDFViewer ref={pdfViewerRef} className="pdfviewer">
             <Document title="Reporte NEA">
               <Page size="A4" orientation="landscape" style={styles.page}>
+                {!isSaved && (
+                  <Text
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%) rotate(-45deg)",
+                      fontSize: 100,
+                      opacity: 0.2,
+                      color: "#808080",
+                      fontWeight: "bold",
+                    }}
+                    fixed
+                  >
+                    PRUEBA
+                  </Text>
+                )}
                 <Image src="../src/assets/GORE.png" style={styles.image} />
                 <View style={styles.body}>
                   <View

@@ -102,7 +102,7 @@ function KardexEntradaSalida() {
     removeProductoItem,
   } = useProductosStore();
   const { dataempresa } = useEmpresaStore();
-console.log("productoItemSelect:", productoItemSelect);
+  console.log("productoItemSelect:", productoItemSelect);
   const [dependencia, setDependencia] = useState("");
   const [solicitaEntrega, setSolicitaEntrega] = useState("");
   const [destino, setDestino] = useState("");
@@ -186,67 +186,67 @@ console.log("productoItemSelect:", productoItemSelect);
   const cantidadProductos = productosConUltimaSalida.length;
   const cantidadProductosTexto = numberToText(cantidadProductos);
 
-const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false) => {
-  if (isHeader) {
-    return (
-      <View style={styles.row} key="header">
-        <Text style={styles.itemHeaderCell}>ITEM</Text>
-        <Text style={styles.codigoHeaderCell}>CÓDIGO</Text>
-        <Text style={styles.cantidadHeaderCell}>CANTIDAD</Text>
-        <Text style={styles.descripcionHeaderCell}>DESCRIPCIÓN</Text>
-        <Text style={styles.unidadmedidaHeaderCell}>UND.MED.</Text>
-        <Text style={styles.cuentaHeaderCell}>CUENTA</Text>
-        <Text style={styles.cantDespHeaderCell}>CANT. DESPACHADA</Text>
-        <Text style={styles.precioUnitHeaderCell}>PREC.UNIT.</Text>
-        <Text style={styles.totalHeaderCell}>TOTAL</Text>
-      </View>
-    );
-  } else if (isTotal) {
-    return (
-      <View style={styles.totalRow} key="total">
-        <Text style={styles.emptyCell}></Text>
-        <Text style={styles.emptyCellWide}></Text>
-        <Text style={styles.emptyCellMedium}></Text>
-        <Text style={styles.emptyCellExtraWide}></Text>
-        <Text style={styles.emptyCellMedium}></Text> {/* Ajustado para la nueva columna */}
-        <Text style={styles.emptyCellLong}></Text>
-        <Text style={styles.emptyCellLong}></Text>
-        <Text style={styles.totalPrecioUnitCell}>TOTAL</Text>
-        <Text style={styles.totalTotalCell}>
-          {`S/. ${tableTotal.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-        </Text>
-      </View>
-    );
-  } else {
-    return (
-      <View style={styles.row} key={rowData.id}>
-        <Text style={styles.itemCell}>{index + 1}</Text>
-        <Text style={styles.codigoCell}>{rowData.codigointerno || ""}</Text>
-        <Text style={styles.cantidadCell}>{rowData.stock || ""}</Text>
-        <Text style={styles.descripcionCell}>{rowData.descripcion || ""}</Text>
-        <Text style={styles.unidadmedidaCell}>{rowData.producto?.unidad_medida || ""}</Text> {/* Corrección aquí */}
-        <Text style={styles.cuentaCell}>{rowData.codigobarras || ""}</Text>
-        <Text style={styles.cantDespCell}>{rowData.cantidad || ""}</Text>
-        <Text style={styles.precioUnitCell}>
-          {rowData.preciocompra
-            ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`
-            : ""}
-        </Text>
-        <Text style={styles.totalCell}>
-          {rowData.cantidad && rowData.preciocompra
-            ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`
-            : ""}
-        </Text>
-      </View>
-    );
-  }
-};
+  const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false) => {
+    if (isHeader) {
+      return (
+        <View style={styles.row} key="header">
+          <Text style={styles.itemHeaderCell}>ITEM</Text>
+          <Text style={styles.codigoHeaderCell}>CÓDIGO</Text>
+          <Text style={styles.cantidadHeaderCell}>CANTIDAD</Text>
+          <Text style={styles.descripcionHeaderCell}>DESCRIPCIÓN</Text>
+          <Text style={styles.unidadmedidaHeaderCell}>UND.MED.</Text>
+          <Text style={styles.cuentaHeaderCell}>CUENTA</Text>
+          <Text style={styles.cantDespHeaderCell}>CANT. DESPACHADA</Text>
+          <Text style={styles.precioUnitHeaderCell}>PREC.UNIT.</Text>
+          <Text style={styles.totalHeaderCell}>TOTAL</Text>
+        </View>
+      );
+    } else if (isTotal) {
+      return (
+        <View style={styles.totalRow} key="total">
+          <Text style={styles.emptyCell}></Text>
+          <Text style={styles.emptyCellWide}></Text>
+          <Text style={styles.emptyCellMedium}></Text>
+          <Text style={styles.emptyCellExtraWide}></Text>
+          <Text style={styles.emptyCellMedium}></Text>
+          <Text style={styles.emptyCellLong}></Text>
+          <Text style={styles.emptyCellLong}></Text>
+          <Text style={styles.totalPrecioUnitCell}>TOTAL</Text>
+          <Text style={styles.totalTotalCell}>
+            {`S/. ${tableTotal.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          </Text>
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.row} key={rowData.id}>
+          <Text style={styles.itemCell}>{index + 1}</Text>
+          <Text style={styles.codigoCell}>{rowData.codigointerno || ""}</Text>
+          <Text style={styles.cantidadCell}>{rowData.stock || ""}</Text>
+          <Text style={styles.descripcionCell}>{rowData.descripcion || ""}</Text>
+          <Text style={styles.unidadmedidaCell}>{rowData.producto?.unidad_medida || ""}</Text>
+          <Text style={styles.cuentaCell}>{rowData.codigobarras || ""}</Text>
+          <Text style={styles.cantDespCell}>{rowData.cantidad || ""}</Text>
+          <Text style={styles.precioUnitCell}>
+            {rowData.preciocompra
+              ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : ""}
+          </Text>
+          <Text style={styles.totalCell}>
+            {rowData.cantidad && rowData.preciocompra
+              ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`
+              : ""}
+          </Text>
+        </View>
+      );
+    }
+  };
 
   const generatePDF = async () => {
     try {
@@ -258,15 +258,8 @@ const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false
 
       if (error) throw error;
 
-      const nuevoContador = data.contador_pecosa + 1;
-      const formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
-
-      const { error: updateError } = await supabase
-        .from("contador_documentos")
-        .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
-        .eq("id", 1);
-
-      if (updateError) throw updateError;
+      const nextContador = data.contador_pecosa + 1;
+      const formattedContador = `COREX PECOSA - ${nextContador.toString().padStart(4, "0")}`;
 
       setContador(formattedContador);
       setShowPDF(true);
@@ -278,92 +271,98 @@ const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false
   };
 
   const saveToDatabase = async () => {
-  try {
-    setIsSaving(true);
-    let formattedContador = contador;
+    try {
+      setIsSaving(true);
+      let formattedContador = contador;
 
-    if (!formattedContador) {
-      const { data, error } = await supabase
-        .from("contador_documentos")
-        .select("contador_pecosa")
-        .eq("id", 1)
+      if (!formattedContador) {
+        const { data, error } = await supabase
+          .from("contador_documentos")
+          .select("contador_pecosa")
+          .eq("id", 1)
+          .single();
+
+        if (error) throw error;
+
+        const nuevoContador = data.contador_pecosa + 1;
+        formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
+
+        const { error: updateError } = await supabase
+          .from("contador_documentos")
+          .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
+          .eq("id", 1);
+
+        if (updateError) throw updateError;
+
+        setContador(formattedContador);
+      } else {
+        const nuevoContador = parseInt(formattedContador.split("-")[1].trim());
+        const { error: updateError } = await supabase
+          .from("contador_documentos")
+          .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
+          .eq("id", 1);
+
+        if (updateError) throw updateError;
+      }
+
+      const { data: existing } = await supabase
+        .from("registro_pecosa")
+        .select("id")
+        .eq("numero_documento", formattedContador)
         .single();
 
-      if (error) throw error;
+      if (existing) {
+        throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
+      }
 
-      const nuevoContador = data.contador_pecosa + 1;
-      formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
+      if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
+        throw new Error("Invalid id_empresa: must be a valid integer");
+      }
 
-      const { error: updateError } = await supabase
-        .from("contador_documentos")
-        .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
-        .eq("id", 1);
+      const productosConCantidad = productoItemSelect.map((producto) => {
+        const ultimaSalida = productosConUltimaSalida.find(
+          (item) => item.producto.id === producto.id
+        );
+        return {
+          ...producto,
+          cantidad: ultimaSalida ? ultimaSalida.cantidad : "0",
+        };
+      });
 
-      if (updateError) throw updateError;
-
-      setContador(formattedContador);
-    }
-
-    // Verificar si el numero_documento ya existe
-    const { data: existing } = await supabase
-      .from("registro_pecosa")
-      .select("id")
-      .eq("numero_documento", formattedContador)
-      .single();
-
-    if (existing) {
-      throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
-    }
-
-    if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
-      throw new Error("Invalid id_empresa: must be a valid integer");
-    }
-
-    // Merge productoItemSelect with cantidad from productosConUltimaSalida
-    const productosConCantidad = productoItemSelect.map((producto) => {
-      const ultimaSalida = productosConUltimaSalida.find(
-        (item) => item.producto.id === producto.id
-      );
-      return {
-        ...producto,
-        cantidad: ultimaSalida ? ultimaSalida.cantidad : "0", // Use cantidad from ultimaSalida or default to "0"
+      const formData = {
+        numero_documento: formattedContador,
+        dependencia_solicitante: dependencia || "No especificado",
+        solicita_entrega: solicitaEntrega || null,
+        destino: destino || null,
+        referencia: referencia || null,
+        cuenta_mayor: ctaMayor || null,
+        programa: programa || null,
+        sub_programa: subPrograma || null,
+        meta: meta || null,
+        productos: productosConCantidad,
+        total_monto: tableTotal,
+        id_empresa: parseInt(dataempresa.id),
+        generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
       };
-    });
 
-    const formData = {
-      numero_documento: formattedContador,
-      dependencia_solicitante: dependencia || "No especificado",
-      solicita_entrega: solicitaEntrega || null,
-      destino: destino || null,
-      referencia: referencia || null,
-      cuenta_mayor: ctaMayor || null,
-      programa: programa || null,
-      sub_programa: subPrograma || null,
-      meta: meta || null,
-      productos: productosConCantidad, // Use the updated productos array
-      total_monto: tableTotal,
-      id_empresa: parseInt(dataempresa.id),
-      generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
-    };
+      console.log("Inserting into registro_pecosa:", formData);
 
-    console.log("Inserting into registro_pecosa:", formData);
+      const { error: insertError } = await supabase
+        .from("registro_pecosa")
+        .insert([formData]);
 
-    const { error: insertError } = await supabase
-      .from("registro_pecosa")
-      .insert([formData]);
+      if (insertError) throw insertError;
 
-    if (insertError) throw insertError;
-
-    setIsSaved(true);
-    setSavedDocumentoId(formattedContador);
-    setShowSuccessMessage(true);
-  } catch (error) {
-    console.error("Error al guardar los datos:", error);
-    alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
-  } finally {
-    setIsSaving(false);
-  }
-};
+      setIsSaved(true);
+      setSavedDocumentoId(formattedContador);
+      setShowSuccessMessage(true);
+    } catch (error) {
+      console.error("Error al guardar los datos:", error);
+      alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleSaveClick = () => {
     setShowConfirmModal(true);
@@ -668,6 +667,23 @@ const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false
           <PDFViewer ref={pdfViewerRef} className="pdfviewer">
             <Document title="Reporte PECOSA">
               <Page size="A4" orientation="landscape" style={styles.page}>
+                {!isSaved && (
+                  <Text
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%) rotate(-45deg)",
+                      fontSize: 100,
+                      opacity: 0.2,
+                      color: "#808080",
+                      fontWeight: "bold",
+                    }}
+                    fixed
+                  >
+                    PRUEBA
+                  </Text>
+                )}
                 <Image src="../src/assets/GORE.png" style={styles.image} />
                 <View style={styles.body}>
                   <View
