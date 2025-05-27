@@ -10,9 +10,8 @@ import {
   RegistrarAdmin,
   supabase,
   FooterLogin,
- 
 } from "../../index";
-import {Device} from "../../styles/breakpoints"
+import { Device } from "../../styles/breakpoints";
 import estrellas from "../../assets/estrellasVarias.svg";
 import { useMutation } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
@@ -21,32 +20,38 @@ import { useForm } from "react-hook-form";
 import carrito from "../../assets/carrito.svg";
 import logo from "../../assets/inventarioslogo.png";
 import { MdOutlineInfo } from "react-icons/md";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // Import eye icons
 import { ThemeContext } from "../../App";
+
 export function LoginTemplate() {
   const { setTheme, theme } = useContext(ThemeContext);
-  setTheme("light")
+  setTheme("light");
   const { insertarUsuario } = useUsuariosStore();
   const { signInWithEmail } = useAuthStore();
   const [state, setState] = useState(false);
   const [correo, setCorreo] = useState("");
   const [pass, setPass] = useState("");
   const [stateInicio, setStateInicio] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: async () => {
       const p = {
-        correo: "frank@gmail.com",
-        pass: "gTh1238",
+        correo,
+        pass,
       };
       await insertarUsuario(p);
     },
   });
+
   const {
     register,
     formState: { errors },
     handleSubmit,
     watch,
   } = useForm();
+
   async function iniciar(data) {
     const response = await signInWithEmail({
       correo: data.correo,
@@ -58,6 +63,10 @@ export function LoginTemplate() {
       setStateInicio(!stateInicio);
     }
   }
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <Container imgfondo={v.imagenfondo}>
@@ -78,7 +87,6 @@ export function LoginTemplate() {
             <TextoStateInicio>datos incorrectos</TextoStateInicio>
           )}
           <span className="ayuda">
-            {" "}
             Puedes crear una cuenta nueva ó <br></br>solicitar a tu empleador
             una. <MdOutlineInfo />
           </span>
@@ -98,15 +106,34 @@ export function LoginTemplate() {
               {errors.correo?.type === "required" && <p>Campo requerido</p>}
             </InputText>
             <InputText icono={<v.iconopass />}>
-              <input
-                className="form__field"
-                onChange={(e) => setPass(e.target.value)}
-                type="password"
-                placeholder="contraseña"
-                {...register("pass", {
-                  required: true,
-                })}
-              />
+              <div style={{ position: "relative", width: "100%" }}>
+                <input
+                  className="form__field"
+                  onChange={(e) => setPass(e.target.value)}
+                  type={showPassword ? "text" : "password"} // Toggle input type
+                  placeholder="contraseña"
+                  {...register("pass", {
+                    required: true,
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={toggleShowPassword}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "20px",
+                    color: "#555",
+                  }}
+                >
+                  {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                </button>
+              </div>
               <label className="form__label">Contraseña</label>
               {errors.pass?.type === "required" && <p>Campo requerido</p>}
             </InputText>
@@ -125,6 +152,7 @@ export function LoginTemplate() {
     </Container>
   );
 }
+
 const Container = styled.div`
   background-size: cover;
   height: 100vh;
@@ -205,7 +233,6 @@ const Container = styled.div`
 
       img {
         width: 40%;
-
         animation: flotar 1.5s ease-in-out infinite alternate;
       }
     }
@@ -213,7 +240,7 @@ const Container = styled.div`
       color: #fc6c32;
       font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom:30px;
+      margin-bottom: 30px;
     }
     .ayuda {
       position: absolute;
@@ -247,15 +274,18 @@ const Container = styled.div`
     }
   }
 `;
+
 const Titulo = styled.span`
   font-size: 3rem;
   font-weight: 700;
 `;
+
 const ContainerBtn = styled.div`
   margin-top: 15px;
   display: flex;
   justify-content: center;
 `;
+
 const TextoStateInicio = styled.p`
   color: #fc7575;
 `;
