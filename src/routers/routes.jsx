@@ -19,12 +19,13 @@ import {
   HistorialNeas,
   KardexSalida,
   KardexEntrada,
-  
 } from "../index";
 
-
+import EdicionNeasList from "../components/organismos/report/edicionnea";
+import EdicionPecosaList from "../components/organismos/report/edicionpecosa";
 import StockActualTodos from "../components/organismos/report/StockActualTodos";
 import { Layout } from "../hooks/Layout";
+import ReportePecosaList from "../components/organismos/report/StockInventarioValorado";
 export function MyRoutes() {
   return (
     <Routes>
@@ -152,6 +153,14 @@ export function MyRoutes() {
         <Route
           path="historial-neas"
           element={<HistorialNeas />}
+        />  
+        <Route
+          path="edicion-pecosas"
+          element={<EdicionPecosaList />}
+        />  
+        <Route
+          path="edicion-neas"
+          element={<EdicionNeasList />}
         />  
       </Route>
       

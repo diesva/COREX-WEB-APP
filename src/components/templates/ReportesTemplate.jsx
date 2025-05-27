@@ -17,19 +17,29 @@ export function ReportesTemplate() {
             
           </SidebarSection>*/}
           <SidebarSection>
-          <SidebarTitle>Reporte Kardex</SidebarTitle>
+          <SidebarTitle>Generar Reportes</SidebarTitle>
           <SidebarItem to="kardex-entradas-salidas">Reporte Pecosa</SidebarItem>
           
-          <SidebarItem to="kardex-entradas">Reporte Neas</SidebarItem>
+          <SidebarItem to="kardex-entradas">Reporte Nea</SidebarItem>
           </SidebarSection>
 
 
 
           <SidebarSection>
           <SidebarTitle to="ss">Historial de Reportes</SidebarTitle>
-          <SidebarItem to="historial-pecosas">Pecosas</SidebarItem>
+          <SidebarItem to="historial-pecosas">Pecosa</SidebarItem>
           <SidebarItem to="historial-neas">Neas</SidebarItem>
           </SidebarSection>
+ 
+ 
+          <SidebarSection>
+          <SidebarTitle to="ss">Edición de Reportes</SidebarTitle>
+          <SidebarItem to="edicion-pecosas">Pecosa</SidebarItem>
+          <SidebarItem to="edicion-neas">Nea</SidebarItem>
+          </SidebarSection>
+ 
+ 
+ 
         </Sidebar>
       </PageContainer>
     </Container>

@@ -34,7 +34,7 @@ export function TablaProductos({
   const { eliminarProductos } = useProductosStore();
   function eliminar(p) {
     Swal.fire({
-      title: "¿Estás seguro(a)(e)?",
+      title: "¿Estás seguro?",
       text: "Una vez eliminado, ¡no podrá recuperar este registro!",
       icon: "warning",
       showCancelButton: true,

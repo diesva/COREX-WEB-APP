@@ -98,7 +98,7 @@ export function RegistrarSalidaEntrada({ onClose, dataSelect, accion, tipo }) {
       // UX: breve espera y recarga
       setTimeout(() => {
         window.location.reload();
-      }, 5500);
+      }, 500);
     } catch (err) {
       console.error(err);
       alert("Error al guardar. Intenta nuevamente.");

@@ -215,7 +215,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#dcdcdc",
   },
   totalTotalCell: {
-    width: 90,
+    width: 84,
     textAlign: "center",
     fontSize: 6,
     padding: 3,
@@ -288,5 +288,23 @@ export const styles = StyleSheet.create({
   signatureText: {
     fontSize: 6,
     textAlign: "center",
+  },
+  unidadmedidaCell: {
+    width: 90,
+    textAlign: "center",
+    fontSize: 6,
+    padding: 3,
+    borderLeft: 1,
+    borderLeftColor: "#000",
+  },
+  unidadmedidaHeaderCell: {
+    width: 90,
+    textAlign: "center",
+    fontSize: 6,
+    padding: 3,
+    backgroundColor: "#dcdcdc",
+    fontWeight: "bold",
+    borderLeft: 1,
+    borderLeftColor: "#000",
   },
 });

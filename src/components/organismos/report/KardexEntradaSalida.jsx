@@ -102,7 +102,7 @@ function KardexEntradaSalida() {
     removeProductoItem,
   } = useProductosStore();
   const { dataempresa } = useEmpresaStore();
-
+console.log("productoItemSelect:", productoItemSelect);
   const [dependencia, setDependencia] = useState("");
   const [solicitaEntrega, setSolicitaEntrega] = useState("");
   const [destino, setDestino] = useState("");
@@ -186,64 +186,67 @@ function KardexEntradaSalida() {
   const cantidadProductos = productosConUltimaSalida.length;
   const cantidadProductosTexto = numberToText(cantidadProductos);
 
-  const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false) => {
-    if (isHeader) {
-      return (
-        <View style={styles.row} key="header">
-          <Text style={styles.itemHeaderCell}>ITEM</Text>
-          <Text style={styles.codigoHeaderCell}>CÓDIGO</Text>
-          <Text style={styles.cantidadHeaderCell}>CANTIDAD</Text>
-          <Text style={styles.descripcionHeaderCell}>DESCRIPCIÓN</Text>
-          <Text style={styles.cuentaHeaderCell}>CUENTA</Text>
-          <Text style={styles.cantDespHeaderCell}>CANT. DESPACHADA</Text>
-          <Text style={styles.precioUnitHeaderCell}>PREC.UNIT.</Text>
-          <Text style={styles.totalHeaderCell}>TOTAL</Text>
-        </View>
-      );
-    } else if (isTotal) {
-      return (
-        <View style={styles.totalRow} key="total">
-          <Text style={styles.emptyCell}></Text>
-          <Text style={styles.emptyCellWide}></Text>
-          <Text style={styles.emptyCellMedium}></Text>
-          <Text style={styles.emptyCellExtraWide}></Text>
-          <Text style={styles.emptyCellLong}></Text>
-          <Text style={styles.emptyCellLong}></Text>
-          <Text style={styles.totalPrecioUnitCell}>TOTAL</Text>
-          <Text style={styles.totalTotalCell}>
-            {`S/. ${tableTotal.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          </Text>
-        </View>
-      );
-    } else {
-      return (
-        <View style={styles.row} key={rowData.id}>
-          <Text style={styles.itemCell}>{index + 1}</Text>
-          <Text style={styles.codigoCell}>{rowData.codigointerno || ""}</Text>
-          <Text style={styles.cantidadCell}>{rowData.stock || ""}</Text>
-          <Text style={styles.descripcionCell}>{rowData.descripcion || ""}</Text>
-          <Text style={styles.cuentaCell}>{rowData.codigobarras || ""}</Text>
-          <Text style={styles.cantDespCell}>{rowData.cantidad || ""}</Text>
-          <Text style={styles.precioUnitCell}>
-            {rowData.preciocompra
-              ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`
-              : ""}
-          </Text>
-          <Text style={styles.totalCell}>
-            {rowData.cantidad && rowData.preciocompra
-              ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`
-              : ""}
-          </Text>
-        </View>
-      );
-    }
-  };
+const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false) => {
+  if (isHeader) {
+    return (
+      <View style={styles.row} key="header">
+        <Text style={styles.itemHeaderCell}>ITEM</Text>
+        <Text style={styles.codigoHeaderCell}>CÓDIGO</Text>
+        <Text style={styles.cantidadHeaderCell}>CANTIDAD</Text>
+        <Text style={styles.descripcionHeaderCell}>DESCRIPCIÓN</Text>
+        <Text style={styles.unidadmedidaHeaderCell}>UND.MED.</Text>
+        <Text style={styles.cuentaHeaderCell}>CUENTA</Text>
+        <Text style={styles.cantDespHeaderCell}>CANT. DESPACHADA</Text>
+        <Text style={styles.precioUnitHeaderCell}>PREC.UNIT.</Text>
+        <Text style={styles.totalHeaderCell}>TOTAL</Text>
+      </View>
+    );
+  } else if (isTotal) {
+    return (
+      <View style={styles.totalRow} key="total">
+        <Text style={styles.emptyCell}></Text>
+        <Text style={styles.emptyCellWide}></Text>
+        <Text style={styles.emptyCellMedium}></Text>
+        <Text style={styles.emptyCellExtraWide}></Text>
+        <Text style={styles.emptyCellMedium}></Text> {/* Ajustado para la nueva columna */}
+        <Text style={styles.emptyCellLong}></Text>
+        <Text style={styles.emptyCellLong}></Text>
+        <Text style={styles.totalPrecioUnitCell}>TOTAL</Text>
+        <Text style={styles.totalTotalCell}>
+          {`S/. ${tableTotal.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+        </Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.row} key={rowData.id}>
+        <Text style={styles.itemCell}>{index + 1}</Text>
+        <Text style={styles.codigoCell}>{rowData.codigointerno || ""}</Text>
+        <Text style={styles.cantidadCell}>{rowData.stock || ""}</Text>
+        <Text style={styles.descripcionCell}>{rowData.descripcion || ""}</Text>
+        <Text style={styles.unidadmedidaCell}>{rowData.producto?.unidad_medida || ""}</Text> {/* Corrección aquí */}
+        <Text style={styles.cuentaCell}>{rowData.codigobarras || ""}</Text>
+        <Text style={styles.cantDespCell}>{rowData.cantidad || ""}</Text>
+        <Text style={styles.precioUnitCell}>
+          {rowData.preciocompra
+            ? `S/. ${parseFloat(rowData.preciocompra).toLocaleString("es-PE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            : ""}
+        </Text>
+        <Text style={styles.totalCell}>
+          {rowData.cantidad && rowData.preciocompra
+            ? `S/. ${(parseFloat(rowData.cantidad) * parseFloat(rowData.preciocompra)).toLocaleString("es-PE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            : ""}
+        </Text>
+      </View>
+    );
+  }
+};
 
   const generatePDF = async () => {
     try {

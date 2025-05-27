@@ -54,6 +54,7 @@ export { default as StockActualTodos } from './components/organismos/report/Stoc
 export { default as StockBajoMinimo } from './components/organismos/report/StockBajoMinimo';
 export { default as StockInventarioValorado } from './components/organismos/report/StockInventarioValorado';
 export { default as HistorialNeas } from './components/organismos/report/HistorialNeas';
+
 export * from './components/organismos/sidebar/Sidebar';
 export * from './components/organismos/sidebar/SidebarCard';
 export * from './components/organismos/tablas/AccionesTabla';
