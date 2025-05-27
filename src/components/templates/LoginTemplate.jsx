@@ -112,11 +112,11 @@ export function LoginTemplate() {
             </InputText>
             <ContainerBtn>
               <Btnsave titulo="Iniciar" bgcolor="#fc6b32" />
-              <Btnsave
+              {/*<Btnsave
                 funcion={() => setState(!state)}
                 titulo="Crear cuenta"
                 bgcolor="#ffffff"
-              />
+              />*/}
             </ContainerBtn>
           </form>
         </div>

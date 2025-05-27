@@ -278,81 +278,92 @@ const renderTableRow = (rowData, isHeader = false, index = null, isTotal = false
   };
 
   const saveToDatabase = async () => {
-    try {
-      setIsSaving(true);
-      let formattedContador = contador;
+  try {
+    setIsSaving(true);
+    let formattedContador = contador;
 
-      if (!formattedContador) {
-        const { data, error } = await supabase
-          .from("contador_documentos")
-          .select("contador_pecosa")
-          .eq("id", 1)
-          .single();
-
-        if (error) throw error;
-
-        const nuevoContador = data.contador_pecosa + 1;
-        formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
-
-        const { error: updateError } = await supabase
-          .from("contador_documentos")
-          .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
-          .eq("id", 1);
-
-        if (updateError) throw updateError;
-
-        setContador(formattedContador);
-      }
-
-      // Verificar si el numero_documento ya existe
-      const { data: existing } = await supabase
-        .from("registro_pecosa")
-        .select("id")
-        .eq("numero_documento", formattedContador)
+    if (!formattedContador) {
+      const { data, error } = await supabase
+        .from("contador_documentos")
+        .select("contador_pecosa")
+        .eq("id", 1)
         .single();
 
-      if (existing) {
-        throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
-      }
+      if (error) throw error;
 
-      if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
-        throw new Error("Invalid id_empresa: must be a valid integer");
-      }
+      const nuevoContador = data.contador_pecosa + 1;
+      formattedContador = `COREX PECOSA - ${nuevoContador.toString().padStart(4, "0")}`;
 
-      const formData = {
-        numero_documento: formattedContador,
-        dependencia_solicitante: dependencia || "No especificado",
-        solicita_entrega: solicitaEntrega || null,
-        destino: destino || null,
-        referencia: referencia || null,
-        cuenta_mayor: ctaMayor || null,
-        programa: programa || null,
-        sub_programa: subPrograma || null,
-        meta: meta || null,
-        productos: productoItemSelect,
-        total_monto: tableTotal,
-        id_empresa: parseInt(dataempresa.id),
-        generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
-      };
+      const { error: updateError } = await supabase
+        .from("contador_documentos")
+        .update({ contador_pecosa: nuevoContador, updated_at: new Date().toISOString() })
+        .eq("id", 1);
 
-      console.log("Inserting into registro_pecosa:", formData);
+      if (updateError) throw updateError;
 
-      const { error: insertError } = await supabase
-        .from("registro_pecosa")
-        .insert([formData]);
-
-      if (insertError) throw insertError;
-
-      setIsSaved(true);
-      setSavedDocumentoId(formattedContador);
-      setShowSuccessMessage(true);
-    } catch (error) {
-      console.error("Error al guardar los datos:", error);
-      alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
-    } finally {
-      setIsSaving(false);
+      setContador(formattedContador);
     }
-  };
+
+    // Verificar si el numero_documento ya existe
+    const { data: existing } = await supabase
+      .from("registro_pecosa")
+      .select("id")
+      .eq("numero_documento", formattedContador)
+      .single();
+
+    if (existing) {
+      throw new Error(`El documento con ID ${formattedContador} ya está registrado`);
+    }
+
+    if (!dataempresa?.id || isNaN(parseInt(dataempresa.id))) {
+      throw new Error("Invalid id_empresa: must be a valid integer");
+    }
+
+    // Merge productoItemSelect with cantidad from productosConUltimaSalida
+    const productosConCantidad = productoItemSelect.map((producto) => {
+      const ultimaSalida = productosConUltimaSalida.find(
+        (item) => item.producto.id === producto.id
+      );
+      return {
+        ...producto,
+        cantidad: ultimaSalida ? ultimaSalida.cantidad : "0", // Use cantidad from ultimaSalida or default to "0"
+      };
+    });
+
+    const formData = {
+      numero_documento: formattedContador,
+      dependencia_solicitante: dependencia || "No especificado",
+      solicita_entrega: solicitaEntrega || null,
+      destino: destino || null,
+      referencia: referencia || null,
+      cuenta_mayor: ctaMayor || null,
+      programa: programa || null,
+      sub_programa: subPrograma || null,
+      meta: meta || null,
+      productos: productosConCantidad, // Use the updated productos array
+      total_monto: tableTotal,
+      id_empresa: parseInt(dataempresa.id),
+      generado_por: dataKardex?.[0]?.[0]?.nombres || "Usuario X",
+    };
+
+    console.log("Inserting into registro_pecosa:", formData);
+
+    const { error: insertError } = await supabase
+      .from("registro_pecosa")
+      .insert([formData]);
+
+    if (insertError) throw insertError;
+
+    setIsSaved(true);
+    setSavedDocumentoId(formattedContador);
+    setShowSuccessMessage(true);
+  } catch (error) {
+    console.error("Error al guardar los datos:", error);
+    alert(`No se pudo guardar los datos: ${error.message || "Error desconocido"}`);
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleSaveClick = () => {
     setShowConfirmModal(true);

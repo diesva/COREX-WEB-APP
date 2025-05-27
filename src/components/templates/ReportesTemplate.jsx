@@ -27,15 +27,15 @@ export function ReportesTemplate() {
 
           <SidebarSection>
           <SidebarTitle to="ss">Historial de Reportes</SidebarTitle>
-          <SidebarItem to="historial-pecosas">Pecosa</SidebarItem>
-          <SidebarItem to="historial-neas">Neas</SidebarItem>
+          <SidebarItem to="historial-pecosas">Historial Pecosa</SidebarItem>
+          <SidebarItem to="historial-neas">Historial Neas</SidebarItem>
           </SidebarSection>
  
  
           <SidebarSection>
           <SidebarTitle to="ss">Edición de Reportes</SidebarTitle>
-          <SidebarItem to="edicion-pecosas">Pecosa</SidebarItem>
-          <SidebarItem to="edicion-neas">Nea</SidebarItem>
+          <SidebarItem to="edicion-pecosas">Edición Pecosa</SidebarItem>
+          <SidebarItem to="edicion-neas">Edición Nea</SidebarItem>
           </SidebarSection>
  
  
