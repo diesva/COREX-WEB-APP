@@ -142,22 +142,28 @@ export function TablaProductos({
         return filterStatuses.includes(status?.id);
       },
     },
-    /*{
-      accessorKey: "codigobarras",
-      header: "Cuenta Contable",
-      enableSorting: false,
-      cell: (info) => (
-        <td data-title="Cod. barras" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
-      ),
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },*/
+    
+    {
+  accessorKey: "fecha_vencimiento",
+  header: "Fecha Vencimiento",
+  enableSorting: false,
+  cell: (info) => {
+    const fecha = info.getValue();
+    const fechaFormateada = fecha
+      ? new Date(fecha).toLocaleDateString("es-PE", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "4-digit",
+        })
+      : "Sin fecha";
+    return (
+      <td data-title="Fecha Vencimiento" className="ContentCell">
+        <span>{fechaFormateada}</span>
+      </td>
+    );
+  },
+  //enableColumnFilter: false, // Desactivar filtro para fechas por ahora
+},
     {
       accessorKey: "preciocompra",
       header: "Precio Unitario",

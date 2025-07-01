@@ -8,7 +8,7 @@ export function CardEliminarData() {
   const { datausuarios } = useUsuariosStore();
   const eliminar = async () => {
     Swal.fire({
-      title: "¿Estás seguro(a)(e)?",
+      title: "¿Estás seguro?",
       text: "Una vez eliminado, ¡no podrá recuperar estos registros!",
       icon: "warning",
       showCancelButton: true,

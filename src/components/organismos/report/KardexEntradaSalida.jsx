@@ -123,6 +123,11 @@ function KardexEntradaSalida() {
   const [savedDocumentoId, setSavedDocumentoId] = useState(null);
   const pdfViewerRef = useRef(null);
 
+  // Depuración: Mostrar la estructura de destinos
+  useEffect(() => {
+    console.log("Estructura de destinos:", destinos);
+  }, []);
+
   const { data: dataKardex = [] } = useQuery({
     queryKey: ["reporte kardex salida", productoItemSelect.map(p => p.id)],
     queryFn: async () => {
@@ -264,6 +269,7 @@ function KardexEntradaSalida() {
       setContador(formattedContador);
       setShowPDF(true);
       setShowModal(false);
+      console.log("PDF generado con destino:", destino); // Depuración
     } catch (error) {
       console.error("Error al generar el PDF:", error);
       alert(`No se pudo generar el PDF: ${error.message || "Error desconocido"}`);
@@ -393,6 +399,12 @@ function KardexEntradaSalida() {
     removeProductoItem(productId);
   };
 
+  // Manejar la selección del destino
+  const handleDestinoChange = (descripcion) => {
+    setDestino(descripcion || "");
+    console.log("Destino seleccionado:", descripcion || "Ninguno"); // Depuración
+  };
+
   useEffect(() => {
     if (showPDF) {
       const checkIframe = setInterval(() => {
@@ -484,7 +496,7 @@ function KardexEntradaSalida() {
             label="Con Destino a:"
             options={destinos}
             value={destino}
-            onChange={setDestino}
+            onChange={handleDestinoChange}
             placeholder="Buscar destino..."
             labelStyle={{ fontSize: 12 }}
             inputStyle={{ fontSize: 14, padding: "10px 12px" }}
@@ -620,7 +632,7 @@ function KardexEntradaSalida() {
             ) : (
               <>
                 <h3 style={{ fontSize: 16 }}>Confirmar Generación</h3>
-                <p style={{ fontSize: 12 }}>¿Está seguro de generar el documento PDF?</p>
+                <p style={{ fontSize: 12 }}>¿Estás seguro de generar un nuevo documento PDF?</p>
                 <ModalButton primary onClick={generatePDF}>
                   Aceptar
                 </ModalButton>
@@ -637,7 +649,7 @@ function KardexEntradaSalida() {
         <ModalOverlay>
           <ModalContent>
             <h3 style={{ fontSize: 16 }}>Confirmar Guardado</h3>
-            <p style={{ fontSize: 12 }}>¿Está seguro de guardar la información en la base de datos?</p>
+            <p style={{ fontSize: 12 }}>¿Estás seguro de guardar la información en la base de datos?</p>
             <ModalButton primary onClick={handleConfirmSave}>
               Sí
             </ModalButton>
@@ -703,7 +715,7 @@ function KardexEntradaSalida() {
                       <Text>RUC: 20532480397</Text>
                     </View>
                     <View style={{ width: "40%", textAlign: "center" }}>
-                      <Text style={styles.titleText}>COMPROBANTE DE SALIDA PECOSA</Text>
+                      <Text style={styles.titleText}>COMPROBATE DE SALIDA PECOSA</Text>
                       <View style={{ fontSize: 6, textAlign: "center", marginBottom: 5 }}>
                         <Text>Stock: {dataempresa?.nombre || "Almacen Desconocido"}</Text>
                       </View>
@@ -766,8 +778,8 @@ function KardexEntradaSalida() {
                         Resumen por Código de Cuenta
                       </Text>
                       <View style={[styles.row, { backgroundColor: "#f0f0f0" }]}>
-                        <Text style={[styles.cell, { fontWeight: "bold", width: 160 }]}>Código Cuenta</Text>
-                        <Text style={[styles.cell, { fontWeight: "bold", width: 105 }]}>Total Precio (S/.)</Text>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 120 }]}>Código Cuenta</Text>
+                        <Text style={[styles.cell, { fontWeight: "bold", width: 80 }]}>Total Precio (S/.)</Text>
                       </View>
                       {Object.entries(resumenCuentas).map(([codigo, total]) => (
                         <View key={codigo} style={styles.row}>
@@ -827,11 +839,11 @@ function KardexEntradaSalida() {
 }
 
 const Container = styled.div`
+  padding: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 20px;
 `;
 
 const ButtonGroup = styled.div`
@@ -851,7 +863,7 @@ const BuscadorContainer = styled.div`
     z-index: 10;
     background: ${(props) => props.theme.bg};
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
   }
 `;
@@ -862,16 +874,15 @@ const FormInputGroup = styled.div`
   gap: 6px;
   margin-bottom: 12px;
   label {
-    fontSize: 12px;
+    font-size: 12px;
     color: ${(props) => props.theme.text};
   }
   input,
-  select,
-  button {
+  select {
     background-color: ${(props) => props.theme.bg};
     color: ${(props) => props.theme.text};
     border: 1px solid #414244;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 10px 12px;
     font-size: 14px;
     outline: none;

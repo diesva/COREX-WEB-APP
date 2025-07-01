@@ -32,6 +32,11 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
     accion === "Editar" ? { descripcion: dataSelect.unidad_medida } : { descripcion: "" }
   );
 
+  // Estado para el checkbox de fecha de vencimiento
+  const [hasExpirationDate, setHasExpirationDate] = useState(
+    accion === "Editar" ? !!dataSelect.fecha_vencimiento : false
+  );
+
   const [stateMarca, setStateMarca] = useState(false);
   const [stateCategoria, setStateCategoria] = useState(false);
   const [openRegistroMarca, SetopenRegistroMarca] = useState(false);
@@ -84,7 +89,8 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
         preciocompra: parseFloat(data.preciocompra),
         id_categoria: categoriaItemSelect.id,
         id_empresa: dataempresa.id,
-        unidad_medida: unidadMedidaSelect.descripcion, // Agregar unidad_medida
+        unidad_medida: unidadMedidaSelect.descripcion,
+        fecha_vencimiento: hasExpirationDate ? data.fecha_vencimiento : null, // Enviar fecha o null
       };
       await editarProductos(p);
       onClose();
@@ -100,7 +106,8 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
         _preciocompra: parseFloat(data.preciocompra),
         _id_categoria: categoriaItemSelect.id,
         _id_empresa: dataempresa?.id,
-        _unidad_medida: unidadMedidaSelect.descripcion, // Agregar unidad_medida
+        _unidad_medida: unidadMedidaSelect.descripcion,
+        _fecha_vencimiento: hasExpirationDate ? data.fecha_vencimiento : null, // Enviar fecha o null
       };
       await insertarProductos(p);
       onClose();
@@ -111,7 +118,8 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
     if (accion === "Editar") {
       selectMarca({ id: dataSelect.idmarca, descripcion: dataSelect.marca });
       selectCategoria({ id: dataSelect.id_categoria, descripcion: dataSelect.categoria });
-      setUnidadMedidaSelect({ descripcion: dataSelect.unidad_medida }); // Cargar unidad_medida al editar
+      setUnidadMedidaSelect({ descripcion: dataSelect.unidad_medida });
+      setHasExpirationDate(!!dataSelect.fecha_vencimiento); // Establecer estado del checkbox
     }
   }, []);
 
@@ -219,7 +227,6 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
                 />
               )}
             </ContainerSelector>
-            {/* Nuevo campo para unidad_medida */}
             <ContainerSelector>
               <label>Unidad de medida: </label>
               <Selector
@@ -239,6 +246,33 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
                 />
               )}
             </ContainerSelector>
+            {/* Checkbox para fecha de vencimiento */}
+            <CheckboxContainer>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={hasExpirationDate}
+                  onChange={(e) => setHasExpirationDate(e.target.checked)}
+                />
+                Bien con fecha de vencimiento
+              </label>
+            </CheckboxContainer>
+            {/* Input condicional para fecha de vencimiento */}
+            {hasExpirationDate && (
+              <article>
+                <InputText icono={<v.icononombre />}>
+                  <input
+                    className="form__field"
+                    defaultValue={dataSelect.fecha_vencimiento}
+                    type="date"
+                    placeholder=""
+                    {...register("fecha_vencimiento", { required: hasExpirationDate })}
+                  />
+                  <label className="form__label">Fecha de vencimiento</label>
+                  {errors.fecha_vencimiento?.type === "required" && <p>Campo requerido</p>}
+                </InputText>
+              </article>
+            )}
           </section>
           <section className="seccion2">
             <article>
@@ -397,4 +431,19 @@ const ContainerSelector = styled.div`
   gap: 10px;
   align-items: center;
   position: relative;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  label {
+    font-size: 16px;
+    color: ${({ theme }) => theme.text};
+  }
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
 `;

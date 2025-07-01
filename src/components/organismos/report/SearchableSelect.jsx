@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 const SearchableSelect = ({ options, value, onChange, label, placeholder }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(value || "");
   const [isOpen, setIsOpen] = useState(false);
+
+  // Sincronizar searchTerm con value cuando value cambia
+  useEffect(() => {
+    setSearchTerm(value || "");
+  }, [value]);
 
   // Filtrar opciones según el término de búsqueda
   const filteredOptions = options.filter((option) =>
@@ -13,9 +18,20 @@ const SearchableSelect = ({ options, value, onChange, label, placeholder }) => {
 
   // Manejar la selección de una opción
   const handleSelect = (option) => {
-    onChange(option.descripcion);
-    setSearchTerm("");
+    if (option) {
+      onChange(option.descripcion);
+      setSearchTerm(option.descripcion);
+    } else {
+      onChange(""); // Limpiar selección
+      setSearchTerm("");
+    }
     setIsOpen(false);
+  };
+
+  // Manejar el enfoque del input
+  const handleFocus = () => {
+    setSearchTerm(""); // Limpiar búsqueda para mostrar todas las opciones
+    setIsOpen(true);
   };
 
   return (
@@ -24,22 +40,29 @@ const SearchableSelect = ({ options, value, onChange, label, placeholder }) => {
       <SearchContainer>
         <SearchInput
           type="text"
-          placeholder={placeholder}
+          placeholder={value ? "" : placeholder} // Ocultar placeholder si hay selección
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => setIsOpen(true)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={handleFocus}
         />
         {isOpen && (
           <SelectContainer>
             <select
-              size={Math.min(filteredOptions.length, 5)} // Mostrar hasta 5 opciones
+              size={Math.min(filteredOptions.length + 1, 6)} // +1 para la opción "-- Seleccione --"
               onChange={(e) => {
-                const selectedOption = filteredOptions.find(
-                  (opt) => opt.descripcion === e.target.value
-                );
-                if (selectedOption) handleSelect(selectedOption);
+                if (e.target.value === "") {
+                  handleSelect(null); // Limpiar selección
+                } else {
+                  const selectedOption = filteredOptions.find(
+                    (opt) => opt.descripcion === e.target.value
+                  );
+                  if (selectedOption) handleSelect(selectedOption);
+                }
               }}
-              value={value}
+              value={value || ""}
             >
               <option value="">-- Seleccione --</option>
               {filteredOptions.map((option) => (

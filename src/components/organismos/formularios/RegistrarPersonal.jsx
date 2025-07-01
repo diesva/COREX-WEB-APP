@@ -23,12 +23,9 @@ import {
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import { CirclePicker } from "react-color";
-import Emojipicker from "emoji-picker-react";
 import { useEmpresaStore } from "../../../store/EmpresaStore";
 import { Device } from "../../../styles/breakpoints";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "../../../main";
-import { QueryCache } from "@tanstack/react-query";
 
 export function RegistrarPersonal({
   onClose,
@@ -51,6 +48,7 @@ export function RegistrarPersonal({
   });
   const [tipodoc, setTipodoc] = useState({ icono: "", descripcion: "dni" });
   const { datapermisosEdit, mostrarPermisosEdit } = usePermisosStore();
+  const [errorMessage, setErrorMessage] = useState(""); // Estado para mensajes de error
 
   const { isLoading } = useQuery({
     queryKey: ["mostrarpermisosedit", { id_usuario: dataSelect.id }],
@@ -64,113 +62,118 @@ export function RegistrarPersonal({
     handleSubmit,
     watch,
   } = useForm();
-  async function insertar(data) {
-    if (accion === "Editar") {
-      const p = {
-        id: dataSelect.id,
-        nombres: data.nombres,
-        nro_doc: data.nrodoc,
-        telefono: data.telefono,
-        direccion: data.direccion,
-        estado: "activo",
-        tipouser: tipouser.descripcion,
-        tipodoc: tipodoc.descripcion,
-       
-      };
-      await editarusuario(p, checkboxs, dataempresa.id);
-      // refetch()
-      onClose();
-    } else {
-      const p = {
-        nombres: data.nombres,
-        correo: data.correo,
-        nrodoc: data.nrodoc,
-        telefono: data.telefono,
-        direccion: data.direccion,
-        estado: "activo",
-        tipouser: tipouser.descripcion,
-        tipodoc: tipodoc.descripcion,
-        id_empresa: dataempresa.id,
-      };
-      const parametrosAuth = {
-        correo: data.correo,
-        pass: data.pass,
-      };
-      await insertarUsuario(parametrosAuth, p, checkboxs);
 
-      onClose();
+  async function insertar(data) {
+    try {
+      console.log("Datos del formulario:", data); // Depuración
+      setErrorMessage(""); // Limpiar mensaje de error
+      if (accion === "Editar") {
+        const p = {
+          id: dataSelect.id,
+          nombres: data.nombres,
+          nro_doc: data.nrodoc, // Corregido para coincidir con la tabla
+          telefono: data.telefono,
+          direccion: data.direccion,
+          estado: "activo",
+          tipouser: tipouser.descripcion,
+          tipodoc: tipodoc.descripcion,
+          correo: data.correo, // Aseguramos que se envíe el correo
+        };
+        console.log("Objeto para editar:", p); // Depuración
+        await editarusuario(p, checkboxs, dataempresa.id);
+        onClose();
+      } else {
+        const p = {
+          nombres: data.nombres,
+          correo: data.correo,
+          nro_doc: data.nrodoc, // Corregido para coincidir con la tabla
+          telefono: data.telefono,
+          direccion: data.direccion,
+          estado: "activo",
+          tipouser: tipouser.descripcion,
+          tipodoc: tipodoc.descripcion,
+          id_empresa: dataempresa.id,
+        };
+        const parametrosAuth = {
+          correo: data.correo,
+          pass: data.pass,
+        };
+        console.log("Objeto para registrar:", p, "Auth:", parametrosAuth); // Depuración
+        await insertarUsuario(parametrosAuth, p, checkboxs);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error al registrar/editar usuario:", error);
+      setErrorMessage("Error al guardar el usuario. Por favor, intenta de nuevo.");
     }
   }
+
   useEffect(() => {
     if (accion === "Editar") {
-      setTipodoc({icono: "", descripcion: dataSelect.tipodoc})
+      setTipodoc({ icono: "", descripcion: dataSelect.tipodoc });
       setTipouser({
         icono: "",
         descripcion: dataSelect.tipouser,
-      })
-      // selectMarca({ id: dataSelect.idmarca, descripcion: dataSelect.marca });
-      // selectCategoria({
-      //   id: dataSelect.id_categoria,
-      //   descripcion: dataSelect.categoria,
-      // });
+      });
     }
   }, []);
+
   if (isLoading) {
     return <span>cargando...</span>;
   }
+
   return (
     <Container>
       <div className="sub-contenedor">
         <div className="headers">
           <section>
             <h1>
-              {accion == "Editar" ? "Editar personal" : "Registrar personal"}
+              {accion === "Editar" ? "Editar personal" : "Registrar personal"}
             </h1>
           </section>
-
           <section>
             <span onClick={onClose}>x</span>
           </section>
         </div>
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         <form className="formulario" onSubmit={handleSubmit(insertar)}>
           <section className="seccion1">
             <article>
               <InputText icono={<v.icononombre />}>
-                <input 
-               
-                  disabled={accion === "Editar" ? true : false}
-                  className={accion==="Editar"?"form__field disabled":"form__field"}
+                <input
+                  className="form__field"
                   defaultValue={dataSelect.correo}
-                  type="text"
+                  type="email"
                   placeholder=""
                   {...register("correo", {
-                    required: accion==="Editar"?false:true,
+                    required: "El correo es obligatorio",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: "Formato de correo inválido",
+                    },
                   })}
                 />
                 <label className="form__label">Correo</label>
-
-                {errors.correo?.type === "required" && <p>Campo requerido</p>}
+                {errors.correo && <p>{errors.correo.message}</p>}
               </InputText>
             </article>
-            {accion != "Editar" ? (
+            {accion !== "Editar" && (
               <article>
                 <InputText icono={<v.iconopass />}>
                   <input
                     className="form__field"
                     defaultValue={dataSelect.pass}
-                    type="text"
+                    type="password"
                     placeholder=""
                     {...register("pass", {
-                      required: true,
+                      required: "La contraseña es obligatoria",
                     })}
                   />
-                  <label className="form__label">pass</label>
-
-                  {errors.pass?.type === "required" && <p>Campo requerido</p>}
+                  <label className="form__label">Contraseña</label>
+                  {errors.pass && <p>{errors.pass.message}</p>}
                 </InputText>
               </article>
-            ) : null}
-
+            )}
             <article>
               <InputText icono={<v.icononombre />}>
                 <input
@@ -179,12 +182,11 @@ export function RegistrarPersonal({
                   type="text"
                   placeholder=""
                   {...register("nombres", {
-                    required: true,
+                    required: "El nombre es obligatorio",
                   })}
                 />
                 <label className="form__label">Nombres</label>
-
-                {errors.nombres?.type === "required" && <p>Campo requerido</p>}
+                {errors.nombres && <p>{errors.nombres.message}</p>}
               </InputText>
             </article>
             <ContainerSelector>
@@ -196,7 +198,6 @@ export function RegistrarPersonal({
                 texto2={tipodoc.descripcion}
                 funcion={() => setStateMarca(!stateMarca)}
               />
-
               {stateMarca && (
                 <ListaGenerica
                   bottom="-260px"
@@ -206,41 +207,35 @@ export function RegistrarPersonal({
                   funcion={(p) => setTipodoc(p)}
                 />
               )}
-
-              {subaccion}
             </ContainerSelector>
-
             <article>
               <InputText icono={<v.iconostock />}>
                 <input
                   className="form__field"
-                  defaultValue={dataSelect.nro_doc}
-                  type="number"
+                  defaultValue={dataSelect.nro_doc} // Corregido para usar nro_doc
+                  type="text"
                   placeholder=""
                   {...register("nrodoc", {
-                    required: true,
+                    required: "El número de documento es obligatorio",
                   })}
                 />
                 <label className="form__label">Nro. doc</label>
-
-                {errors.nrodoc?.type === "required" && <p>Campo requerido</p>}
+                {errors.nrodoc && <p>{errors.nrodoc.message}</p>}
               </InputText>
             </article>
             <article>
               <InputText icono={<v.iconostockminimo />}>
                 <input
-                  step="0.01"
                   className="form__field"
                   defaultValue={dataSelect.telefono}
-                  type="text"
+                  type="tel"
                   placeholder=""
                   {...register("telefono", {
-                    required: true,
+                    required: "El teléfono es obligatorio",
                   })}
                 />
-                <label className="form__label">Telefono</label>
-
-                {errors.telefono?.type === "required" && <p>Campo requerido</p>}
+                <label className="form__label">Teléfono</label>
+                {errors.telefono && <p>{errors.telefono.message}</p>}
               </InputText>
             </article>
             <article>
@@ -251,14 +246,11 @@ export function RegistrarPersonal({
                   type="text"
                   placeholder=""
                   {...register("direccion", {
-                    required: true,
+                    required: "La dirección es obligatoria",
                   })}
                 />
-                <label className="form__label">Direccion</label>
-
-                {errors.direccion?.type === "required" && (
-                  <p>Campo requerido</p>
-                )}
+                <label className="form__label">Dirección</label>
+                {errors.direccion && <p>{errors.direccion.message}</p>}
               </InputText>
             </article>
           </section>
@@ -272,7 +264,6 @@ export function RegistrarPersonal({
                 texto2={tipouser.descripcion}
                 funcion={() => setStateCategoria(!stateCategoria)}
               />
-
               {stateCategoria && (
                 <ListaGenerica
                   bottom="-150px"
@@ -283,20 +274,13 @@ export function RegistrarPersonal({
                 />
               )}
             </ContainerSelector>
-            PERMISOS:🔑
+            <div>PERMISOS: 🔑</div>
             <ListaModulos
               accion={accion}
               setCheckboxs={setCheckboxs}
               checkboxs={checkboxs}
               tipouser={tipouser}
             />
-            {/* {checkboxs.map((item, index) => {
-              if (item.check) {
-                return <span>{item.nombre}</span>;
-              } else {
-                return null;
-              }
-            })} */}
           </section>
           <div className="btnguardarContent">
             <Btnsave
@@ -310,6 +294,7 @@ export function RegistrarPersonal({
     </Container>
   );
 }
+
 const Container = styled.div`
   transition: 0.5s;
   top: 0;
@@ -388,4 +373,11 @@ const ContainerSelector = styled.div`
   gap: 10px;
   align-items: center;
   position: relative;
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
 `;
