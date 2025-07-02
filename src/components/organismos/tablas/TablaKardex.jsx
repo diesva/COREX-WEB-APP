@@ -16,19 +16,22 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FaArrowsAltV } from "react-icons/fa";
-import {Device} from "../../../styles/breakpoints"
+import { Device } from "../../../styles/breakpoints";
+
 export function TablaKardex({
   data,
   SetopenRegistro,
   setdataSelect,
   setAccion,
 }) {
-  if (data?.length == 0) return;
+  if (data?.length == 0) return null;
+
   const [pagina, setPagina] = useState(1);
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
   const { eliminarCategoria } = useCategoriasStore();
+
   function eliminar(p) {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -45,11 +48,72 @@ export function TablaKardex({
       }
     });
   }
+
   function editar(data) {
     SetopenRegistro(true);
     setdataSelect(data);
     setAccion("Editar");
   }
+
+  // Función para imprimir la tabla
+  function imprimirTabla() {
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>COREX - Impresión Kardex</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+            th { background-color: #f2f2f2; }
+            h1 { text-align: center; }
+            .salida { color: #ed4d4d; font-weight: bold; }
+            .entrada { color: #30c85b; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h1>Kardex</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Motivo</th>
+                <th>Usuario</th>
+                <th>Cantidad</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${table
+                .getRowModel()
+                .rows.map(
+                  (row) => `
+                <tr>
+                  <td>${row.original.descripcion}</td>
+                  <td>${row.original.fecha}</td>
+                  <td class="${row.original.tipo === "salida" ? "salida" : "entrada"}">${
+                    row.original.tipo
+                  }</td>
+                  <td>${row.original.detalle}</td>
+                  <td>${row.original.nombres}</td>
+                  <td>${row.original.cantidad}</td>
+                  <td>${row.original.stock}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  }
+
   const columns = [
     {
       accessorKey: "descripcion",
@@ -84,20 +148,14 @@ export function TablaKardex({
       enableSorting: false,
       cell: (info) => (
         <td data-title="Tipo" className="ContentCell">
-          {info.getValue() == "salida" ? (
-            <Colorcontent
-              color="#ed4d4d"
-              className="contentCategoria"
-            >
+          {info.getValue() === "salida" ? (
+            <Colorcontent color="#ed4d4d" className="contentCategoria">
               {info.getValue()}
             </Colorcontent>
           ) : (
-            <Colorcontent
-            color="#30c85b"
-            className="contentCategoria"
-          >
-            {info.getValue()}
-          </Colorcontent>
+            <Colorcontent color="#30c85b" className="contentCategoria">
+              {info.getValue()}
+            </Colorcontent>
           )}
         </td>
       ),
@@ -113,7 +171,7 @@ export function TablaKardex({
       header: "Motivo",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Usuario" className="ContentCell">
+        <td data-title="Motivo" className="ContentCell">
           <span>{info.getValue()}</span>
         </td>
       ),
@@ -161,7 +219,7 @@ export function TablaKardex({
       header: "Stock",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Usuario" className="ContentCell">
+        <td data-title="Stock" className="ContentCell">
           <span>{info.getValue()}</span>
         </td>
       ),
@@ -173,9 +231,13 @@ export function TablaKardex({
       },
     },
   ];
+
   const table = useReactTable({
     data,
     columns,
+    initialState: {
+      pageSize: 20, // Cambiado de 10 a 20 ítems por página
+    },
     state: {
       columnFilters,
     },
@@ -198,75 +260,75 @@ export function TablaKardex({
         ),
     },
   });
+
   return (
-    <>
-      <Container>
-        <table className="responsive-table">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {header.column.columnDef.header}
-                    {header.column.getCanSort() && (
-                      <span
-                        style={{ cursor: "pointer" }}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <FaArrowsAltV />
-                      </span>
-                    )}
+    <Container>
+      {/* Botón de imprimir (encima de la tabla) */}
+      <ButtonImprimir onClick={imprimirTabla}>Imprimir</ButtonImprimir>
+      <table className="responsive-table">
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id}>
+                  {header.column.columnDef.header}
+                  {header.column.getCanSort() && (
+                    <span
+                      style={{ cursor: "pointer" }}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      <FaArrowsAltV />
+                    </span>
+                  )}
+                  {
                     {
-                      {
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted()]
-                    }
-                    <div
-                      onMouseDown={header.getResizeHandler()}
-                      onTouchStart={header.getResizeHandler()}
-                      className={`resizer ${
-                        header.column.getIsResizing() ? "isResizing" : ""
-                      }`}
-                    />
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((item) => (
-              <tr key={item.id}>
-                {item.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Paginacion
-          table={table}
-          irinicio={() => table.setPageIndex(0)}
-          pagina={table.getState().pagination.pageIndex + 1}
-          setPagina={setPagina}
-          maximo={table.getPageCount()}
-        />
-      </Container>
-    </>
+                      asc: " 🔼",
+                      desc: " 🔽",
+                    }[header.column.getIsSorted()]
+                  }
+                  <div
+                    onMouseDown={header.getResizeHandler()}
+                    onTouchStart={header.getResizeHandler()}
+                    className={`resizer ${
+                      header.column.getIsResizing() ? "isResizing" : ""
+                    }`}
+                  />
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((item) => (
+            <tr key={item.id}>
+              {item.getVisibleCells().map((cell) => (
+                <td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Paginacion
+        table={table}
+        irinicio={() => table.setPageIndex(0)}
+        pagina={table.getState().pagination.pageIndex + 1}
+        setPagina={setPagina}
+        maximo={table.getPageCount()}
+      />
+    </Container>
   );
 }
+
 const Container = styled.div`
   position: relative;
-
   margin: 5% 3%;
   @media (min-width: ${v.bpbart}) {
     margin: 2%;
   }
   @media (min-width: ${v.bphomer}) {
     margin: 2em auto;
-    /* max-width: ${v.bphomer}; */
   }
   .responsive-table {
     width: 100%;
@@ -280,7 +342,6 @@ const Container = styled.div`
     }
     thead {
       position: absolute;
-
       padding: 0;
       border: 0;
       height: 1px;
@@ -316,7 +377,6 @@ const Container = styled.div`
         display: table-row;
       }
     }
-
     th,
     td {
       padding: 0.5em;
@@ -370,7 +430,6 @@ const Container = styled.div`
         justify-content: space-between;
         align-items: center;
         height: 50px;
-
         border-bottom: 1px solid rgba(161, 161, 161, 0.32);
         @media (min-width: ${v.bpbart}) {
           justify-content: center;
@@ -398,15 +457,30 @@ const Container = styled.div`
     }
   }
 `;
+
 const Colorcontent = styled.div`
   color: ${(props) => props.color};
   border-radius: 8px;
-  border:1px dashed ${(props) => props.color};
+  border: 1px dashed ${(props) => props.color};
   text-align: center;
-  padding:3px;
-  width:70%;
-  font-weight:700;
+  padding: 3px;
+  width: 70%;
+  font-weight: 700;
   @media ${Device.tablet} {
-    width:100%;
+    width: 100%;
+  }
+`;
+
+const ButtonImprimir = styled.button`
+  background-color: #3085d6;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 1em;
+  font-size: 1em;
+  &:hover {
+    background-color: #2670b5;
   }
 `;
