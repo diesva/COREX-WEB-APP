@@ -153,7 +153,7 @@ export function TablaProductos({
       ? new Date(fecha).toLocaleDateString("es-PE", {
           day: "2-digit",
           month: "2-digit",
-          year: "4-digit",
+          year: "numeric",
         })
       : "Sin fecha";
     return (

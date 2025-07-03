@@ -104,6 +104,17 @@ const ModalContent = styled.div`
   gap: 20px;
 `;
 
+const PasswordModalContent = styled.div`
+  background-color: ${(props) => props.theme.bg};
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
 const ModalButton = styled.button`
   padding: 8px 16px;
   margin: 8px;
@@ -187,6 +198,9 @@ const ErrorMessage = styled.div`
 function EdicionPecosaList() {
   const [selectedReporte, setSelectedReporte] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [stateListaproductos, setStateListaProductos] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -267,6 +281,7 @@ function EdicionPecosaList() {
       setTimeout(() => {
         setSuccessMessage("");
         setShowModal(false);
+        setShowPasswordModal(false);
       }, 2000);
     },
     onError: (error) => {
@@ -276,24 +291,47 @@ function EdicionPecosaList() {
 
   const handleEditReporte = (reporte) => {
     setSelectedReporte(reporte);
-    // Autocompletar los campos
-    setNumeroDocumento(reporte.numero_documento);
-    setDependencia(reporte.dependencia_solicitante);
-    setSolicitaEntrega(reporte.solicita_entrega || "");
-    setDestino(reporte.destino || "");
-    setReferencia(reporte.referencia || "");
-    setCtaMayor(reporte.cuenta_mayor || "");
-    setPrograma(reporte.programa || "");
-    setSubPrograma(reporte.sub_programa || "");
-    setMeta(reporte.meta || "");
-    setGeneradoPor(reporte.generado_por || "Usuario X");
-    setLocalProductos(reporte.productos || []);
-    // Formatear fecha_generacion para input datetime-local
-    const fecha = new Date(reporte.fecha_generacion);
-    const formattedFecha = fecha.toISOString().slice(0, 16); // Ej: "2025-05-23T10:46"
-    setFechaGeneracion(formattedFecha);
-    setShowModal(true);
-    setPdfError(null);
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordSubmit = () => {
+    const correctPassword = import.meta.env.VITE_APP_PASSWORD_2 || "admin123"; // Fallback
+    console.log("Environment Password:", import.meta.env.VITE_APP_PASSWORD_2); // Debugging
+    const enteredPassword = password.trim(); // Remove whitespace
+    if (enteredPassword === correctPassword) {
+      setShowPasswordModal(false);
+      setPassword("");
+      setPasswordError("");
+      setNumeroDocumento(selectedReporte.numero_documento);
+      setDependencia(selectedReporte.dependencia_solicitante);
+      setSolicitaEntrega(selectedReporte.solicita_entrega || "");
+      setDestino(selectedReporte.destino || "");
+      setReferencia(selectedReporte.referencia || "");
+      setCtaMayor(selectedReporte.cuenta_mayor || "");
+      setPrograma(selectedReporte.programa || "");
+      setSubPrograma(selectedReporte.sub_programa || "");
+      setMeta(selectedReporte.meta || "");
+      setGeneradoPor(selectedReporte.generado_por || "Usuario X");
+      setLocalProductos(selectedReporte.productos || []);
+      const fecha = new Date(selectedReporte.fecha_generacion);
+      const formattedFecha = fecha.toISOString().slice(0, 16);
+      setFechaGeneracion(formattedFecha);
+      setShowModal(true);
+      setPdfError(null);
+    } else {
+      setPasswordError(
+        import.meta.env.VITE_APP_PASSWORD_2
+          ? "Contraseña incorrecta. Inténtalo de nuevo."
+          : "Error: Contraseña no configurada en el servidor. Contacta al administrador."
+      );
+    }
+  };
+
+  const handleClosePasswordModal = () => {
+    setShowPasswordModal(false);
+    setPassword("");
+    setPasswordError("");
+    setSelectedReporte(null);
   };
 
   const handleSaveChanges = () => {
@@ -360,7 +398,6 @@ function EdicionPecosaList() {
     removeProductoItem(productId);
   };
 
-  // Cálculos para el PDF
   const productosConUltimaSalida = localProductos.map((producto, index) => ({
     ...producto,
     id: `${index}-${producto.id || index}`,
@@ -448,7 +485,6 @@ function EdicionPecosaList() {
     }
   };
 
-  // Formatear fecha para el PDF
   const formattedDate = fechaGeneracion
     ? new Date(fechaGeneracion).toLocaleString("es-PE", {
         dateStyle: "short",
@@ -456,7 +492,6 @@ function EdicionPecosaList() {
       })
     : "No especificado";
 
-  // Depuración de datos
   useEffect(() => {
     if (showModal) {
       console.log("Datos para el PDF (PECOSA):", {
@@ -556,6 +591,41 @@ function EdicionPecosaList() {
             ))}
           </tbody>
         </Table>
+      )}
+
+      {showPasswordModal && (
+        <ModalOverlay>
+          <PasswordModalContent>
+            <h3>Ingresar Contraseña</h3>
+            {passwordError && (
+              <ErrorMessage>{passwordError}</ErrorMessage>
+            )}
+            <FormInputGroup>
+              <label>Contraseña:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Ingrese la contraseña"
+              />
+            </FormInputGroup>
+            <ButtonGroup>
+              <ModalButton
+                primary
+                onClick={handlePasswordSubmit}
+                disabled={!password}
+              >
+                Ingresar
+              </ModalButton>
+              <ModalButton
+                danger
+                onClick={handleClosePasswordModal}
+              >
+                Cancelar
+              </ModalButton>
+            </ButtonGroup>
+          </PasswordModalContent>
+        </ModalOverlay>
       )}
 
       {showModal && selectedReporte && (
