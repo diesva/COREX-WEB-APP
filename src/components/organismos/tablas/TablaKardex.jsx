@@ -15,8 +15,32 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { FaArrowsAltV } from "react-icons/fa";
+import { FaArrowsAltV, FaPrint } from "react-icons/fa";
 import { Device } from "../../../styles/breakpoints";
+import { Bar, Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Registrar componentes de Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export function TablaKardex({
   data,
@@ -24,13 +48,224 @@ export function TablaKardex({
   setdataSelect,
   setAccion,
 }) {
-  if (data?.length == 0) return null;
+  if (data?.length === 0) return null;
 
   const [pagina, setPagina] = useState(1);
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
-
   const { eliminarCategoria } = useCategoriasStore();
+
+  // Estados para filtros y ordenación
+  const [stockOrder, setStockOrder] = useState("mayor"); // mayor o menor
+  const [salidasPeriod, setSalidasPeriod] = useState("semana"); // día o semana
+  const [entradasPeriod, setEntradasPeriod] = useState("semana"); // día o semana
+  const [salidasOrder, setSalidasOrder] = useState("mayor"); // mayor o menor
+  const [entradasOrder, setEntradasOrder] = useState("mayor"); // mayor o menor
+
+  // Procesar datos para las gráficas
+  // Gráfica 1: Cantidad de productos
+  const productosUnicos = [...new Set(data.map((item) => item.descripcion))];
+  const stockPorProducto = productosUnicos.map((desc) => {
+    const items = data.filter((item) => item.descripcion === desc);
+    const stock = items.reduce((sum, item) => sum + (parseFloat(item.stock) || 0), 0);
+    return { descripcion: desc, stock };
+  });
+  const totalStock = stockPorProducto.reduce((sum, item) => sum + item.stock, 0);
+  const topStockProductos = stockPorProducto
+    .sort((a, b) =>
+      stockOrder === "mayor" ? b.stock - a.stock : a.stock - b.stock
+    )
+    .slice(0, 10);
+  const stockLabels = topStockProductos.map((item) => item.descripcion);
+  const stockDataPoints = topStockProductos.map((item) => item.stock);
+
+  // Gráfica 2: Ítems tipo salida
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+
+  const salidas = data.filter((item) => item.tipo === "salida");
+  const salidasFiltradas = salidas.filter((item) => {
+    const fecha = new Date(item.fecha);
+    if (salidasPeriod === "día") {
+      return fecha >= startOfDay;
+    } else {
+      return fecha >= startOfWeek;
+    }
+  });
+  const salidasPorProducto = productosUnicos.map((desc) => {
+    const items = salidasFiltradas.filter((item) => item.descripcion === desc);
+    const cantidad = items.reduce((sum, item) => sum + (parseFloat(item.cantidad) || 0), 0);
+    return { descripcion: desc, cantidad };
+  });
+  const topSalidasProductos = salidasPorProducto
+    .filter((item) => item.cantidad > 0)
+    .sort((a, b) => b.cantidad - a.cantidad)
+    .slice(0, 10);
+  const salidasLabels = topSalidasProductos.map((item) => item.descripcion);
+  const salidasDataPoints = topSalidasProductos.map((item) => item.cantidad);
+
+  // Gráfica 3: Ítems tipo entrada
+  const entradas = data.filter((item) => item.tipo === "entrada");
+  const entradasFiltradas = entradas.filter((item) => {
+    const fecha = new Date(item.fecha);
+    if (entradasPeriod === "día") {
+      return fecha >= startOfDay;
+    } else {
+      return fecha >= startOfWeek;
+    }
+  });
+  const entradasPorProducto = productosUnicos.map((desc) => {
+    const items = entradasFiltradas.filter((item) => item.descripcion === desc);
+    const cantidad = items.reduce((sum, item) => sum + (parseFloat(item.cantidad) || 0), 0);
+    return { descripcion: desc, cantidad };
+  });
+  const topEntradasProductos = entradasPorProducto
+    .filter((item) => item.cantidad > 0)
+    .sort((a, b) => b.cantidad - a.cantidad)
+    .slice(0, 10);
+  const entradasLabels = topEntradasProductos.map((item) => item.descripcion);
+  const entradasDataPoints = topEntradasProductos.map((item) => item.cantidad);
+
+  // Gráfica 4: Ítems con mayor cantidad de salidas
+  const salidasTotales = productosUnicos.map((desc) => {
+    const items = salidas.filter((item) => item.descripcion === desc);
+    const cantidad = items.reduce((sum, item) => sum + (parseFloat(item.cantidad) || 0), 0);
+    return { descripcion: desc, cantidad };
+  });
+  const topSalidasTotales = salidasTotales
+    .filter((item) => item.cantidad > 0)
+    .sort((a, b) =>
+      salidasOrder === "mayor" ? b.cantidad - a.cantidad : a.cantidad - b.cantidad
+    )
+    .slice(0, 10);
+  const salidasTotalesLabels = topSalidasTotales.map((item) => item.descripcion);
+  const salidasTotalesDataPoints = topSalidasTotales.map((item) => item.cantidad);
+
+  // Gráfica 5: Ítems con mayor cantidad de entradas
+  const entradasTotales = productosUnicos.map((desc) => {
+    const items = entradas.filter((item) => item.descripcion === desc);
+    const cantidad = items.reduce((sum, item) => sum + (parseFloat(item.cantidad) || 0), 0);
+    return { descripcion: desc, cantidad };
+  });
+  const topEntradasTotales = entradasTotales
+    .filter((item) => item.cantidad > 0)
+    .sort((a, b) =>
+      entradasOrder === "mayor" ? b.cantidad - a.cantidad : a.cantidad - b.cantidad
+    )
+    .slice(0, 10);
+  const entradasTotalesLabels = topEntradasTotales.map((item) => item.descripcion);
+  const entradasTotalesDataPoints = topEntradasTotales.map((item) => item.cantidad);
+
+  // Datos para las gráficas
+  const stockData = {
+    labels: stockLabels,
+    datasets: [
+      {
+        label: "Stock de Productos",
+        data: stockDataPoints,
+        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const salidasData = {
+    labels: salidasLabels,
+    datasets: [
+      {
+        label: `Salidas (${salidasPeriod})`,
+        data: salidasDataPoints,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const entradasData = {
+    labels: entradasLabels,
+    datasets: [
+      {
+        label: `Entradas (${entradasPeriod})`,
+        data: entradasDataPoints,
+        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const salidasTotalesData = {
+    labels: salidasTotalesLabels,
+    datasets: [
+      {
+        label: "Cantidad de Salidas",
+        data: salidasTotalesDataPoints,
+        backgroundColor: "rgba(255, 159, 64, 0.6)",
+        borderColor: "rgba(255, 159, 64, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const entradasTotalesData = {
+    labels: entradasTotalesLabels,
+    datasets: [
+      {
+        label: "Cantidad de Entradas",
+        data: entradasTotalesDataPoints,
+        backgroundColor: "rgba(153, 102, 255, 0.6)",
+        borderColor: "rgba(153, 102, 255, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Opciones para las gráficas
+  const stockOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: { display: true, text: `Productos por Stock (Total: ${totalStock})` },
+    },
+  };
+
+  const salidasOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: { display: true, text: `Salidas por Producto (${salidasPeriod})` },
+    },
+  };
+
+  const entradasOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: { display: true, text: `Entradas por Producto (${entradasPeriod})` },
+    },
+  };
+
+  const salidasTotalesOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: { display: true, text: `Productos con Mayor Cantidad de Salidas` },
+    },
+  };
+
+  const entradasTotalesOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: { display: true, text: `Productos con Mayor Cantidad de Entradas` },
+    },
+  };
 
   function eliminar(p) {
     Swal.fire({
@@ -43,7 +278,6 @@ export function TablaKardex({
       confirmButtonText: "Si, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        console.log(p);
         await eliminarCategoria({ id: p });
       }
     });
@@ -236,7 +470,7 @@ export function TablaKardex({
     data,
     columns,
     initialState: {
-      pageSize: 20, // Cambiado de 10 a 20 ítems por página
+      pageSize: 20,
     },
     state: {
       columnFilters,
@@ -263,8 +497,12 @@ export function TablaKardex({
 
   return (
     <Container>
-      {/* Botón de imprimir (encima de la tabla) */}
-      <ButtonImprimir onClick={imprimirTabla}>Imprimir</ButtonImprimir>
+      <ButtonContainer>
+        <ButtonImprimir onClick={imprimirTabla}>
+          <FaPrint style={{ marginRight: "8px" }} />
+          Imprimir
+        </ButtonImprimir>
+      </ButtonContainer>
       <table className="responsive-table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -317,6 +555,100 @@ export function TablaKardex({
         setPagina={setPagina}
         maximo={table.getPageCount()}
       />
+
+      {/* Sección de Gráficos */}
+      <ChartContainer>
+        <ChartSection>
+          <h3>Productos por Stock</h3>
+          <ButtonGroup>
+            <FilterButton
+              active={stockOrder === "mayor"}
+              onClick={() => setStockOrder("mayor")}
+            >
+              Mayor a Menor
+            </FilterButton>
+            <FilterButton
+              active={stockOrder === "menor"}
+              onClick={() => setStockOrder("menor")}
+            >
+              Menor a Mayor
+            </FilterButton>
+          </ButtonGroup>
+          <Bar data={stockData} options={stockOptions} />
+        </ChartSection>
+        <ChartSection>
+          <h3>Salidas por Producto</h3>
+          <ButtonGroup>
+            {/*<FilterButton
+              active={salidasPeriod === "semana"}
+              onClick={() => setSalidasPeriod("semana")}
+            >
+              Día Actual
+            </FilterButton>*/}
+            <FilterButton
+              active={salidasPeriod === "semana"}
+              onClick={() => setSalidasPeriod("semana")}
+            >
+              Semana Actual
+            </FilterButton>
+          </ButtonGroup>
+          <Line data={salidasData} options={salidasOptions} />
+        </ChartSection>
+        <ChartSection>
+          <h3>Entradas por Producto</h3>
+          <ButtonGroup>
+            {/*<FilterButton
+              active={entradasPeriod === "día"}
+              onClick={() => setEntradasPeriod("día")}
+            >
+              Día Actual
+            </FilterButton>*/}
+            <FilterButton
+              active={entradasPeriod === "semana"}
+              onClick={() => setEntradasPeriod("semana")}
+            >
+              Semana Actual
+            </FilterButton>
+          </ButtonGroup>
+          <Line data={entradasData} options={entradasOptions} />
+        </ChartSection>
+        <ChartSection>
+          <h3>Productos con Mayor Cantidad de Salidas</h3>
+          <ButtonGroup>
+            <FilterButton
+              active={salidasOrder === "mayor"}
+              onClick={() => setSalidasOrder("mayor")}
+            >
+              Mayor Cantidad
+            </FilterButton>
+            <FilterButton
+              active={salidasOrder === "menor"}
+              onClick={() => setSalidasOrder("menor")}
+            >
+              Menor Cantidad
+            </FilterButton>
+          </ButtonGroup>
+          <Bar data={salidasTotalesData} options={salidasTotalesOptions} />
+        </ChartSection>
+        <ChartSection>
+          <h3>Productos con Mayor Cantidad de Entradas</h3>
+          <ButtonGroup>
+            <FilterButton
+              active={entradasOrder === "mayor"}
+              onClick={() => setEntradasOrder("mayor")}
+            >
+              Mayor Cantidad
+            </FilterButton>
+            <FilterButton
+              active={entradasOrder === "menor"}
+              onClick={() => setEntradasOrder("menor")}
+            >
+              Menor Cantidad
+            </FilterButton>
+          </ButtonGroup>
+          <Bar data={entradasTotalesData} options={entradasTotalesOptions} />
+        </ChartSection>
+      </ChartContainer>
     </Container>
   );
 }
@@ -471,16 +803,68 @@ const Colorcontent = styled.div`
   }
 `;
 
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1em;
+`;
+
 const ButtonImprimir = styled.button`
+  display: flex;
+  align-items: center;
   background-color: #3085d6;
   color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 1em;
   font-size: 1em;
   &:hover {
     background-color: #2670b5;
+  }
+`;
+
+const ChartContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr; /* Una columna en dispositivos pequeños */
+  gap: 2em;
+  margin-top: 2em;
+  @media ${Device.tablet} {
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas en tablets y superiores */
+    gap: 2em;
+  }
+`;
+
+const ChartSection = styled.div`
+  background-color: ${({ theme }) => theme.bg || "#fff"};
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  h3 {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+    color: ${({ theme }) => theme.text};
+    text-align: center;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 1em;
+`;
+
+const FilterButton = styled.button`
+  background-color: ${(props) => (props.active ? "#3085d6" : "#ccc")};
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  &:hover {
+    background-color: ${(props) => (props.active ? "#2670b5" : "#bbb")};
   }
 `;

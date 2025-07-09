@@ -334,7 +334,7 @@ function StockActualTodos() {
       return (
         <View style={styles.row} key="header">
           <Text style={styles.itemHeaderCell}>ITEM</Text>
-          <Text style={styles.codigoHeaderCell}>CÓDIGO PATRIMONIO</Text>
+          <Text style={styles.codigoHeaderCell}>CÓDIGO CATALOGO MEF</Text>
           <Text style={styles.descripcionHeaderCell}>DESCRIPCIÓN</Text>
           <Text style={styles.stockHeaderCell}>STOCK</Text>
           <Text style={styles.precioHeaderCell}>PRECIO COMPRA</Text>

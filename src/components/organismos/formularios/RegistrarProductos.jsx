@@ -297,7 +297,7 @@ export function RegistrarProductos({ onClose, dataSelect, accion }) {
                   placeholder=""
                   {...register("codigointerno", { required: true })}
                 />
-                <label className="form__label">Codigo de patrimonio</label>
+                <label className="form__label">Codigo Catalogo MEF</label>
                 {errors.codigointerno?.type === "required" && <p>Campo requerido</p>}
               </InputText>
             </article>

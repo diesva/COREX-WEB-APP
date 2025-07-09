@@ -206,7 +206,7 @@ export function TablaProductos({
   const columns = [
     {
       accessorKey: "codigointerno",
-      header: "Codigo Patrimonio",
+      header: "Codigo Catalogo MEF",
       enableSorting: false,
       cell: (info) => (
         <td data-title="Precio venta" className="ContentCell">
